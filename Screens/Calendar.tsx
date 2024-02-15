@@ -4,7 +4,7 @@ import {  CalendarList } from 'react-native-calendars'
 function CalendarScreen() {
   return (
     <View style={styles.container}>
-        <Text>Calendar</Text>
+        <Text  style={styles.textcontainer}>Calendar</Text>
         <CalendarList
         onDayPress={day => {
             console.info(day);
@@ -31,6 +31,9 @@ function CalendarScreen() {
 const  styles = StyleSheet.create({
     container:{
         justifyContent:"center",
+    },
+    textcontainer:{
+        height:50
     }
 })
 
