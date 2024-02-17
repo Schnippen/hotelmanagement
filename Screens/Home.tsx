@@ -1,6 +1,8 @@
 import React, { PropsWithChildren } from 'react'
 import { Button, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View, useColorScheme } from 'react-native'
 import { Colors, Header, ReloadInstructions, DebugInstructions, LearnMoreLinks } from 'react-native/Libraries/NewAppScreen';
+import { supabase } from '../Supabase/supabase';
+//import { supabase } from '../Supabase/supabase';
 
 
 function HomeScreen({navigation}:any) {
@@ -36,6 +38,19 @@ type SectionProps = PropsWithChildren<{
 }
 const isDarkMode = useColorScheme() === 'dark';
 
+
+const  fetchData=async()=>{   
+    let { data: booking, error } = await supabase
+          .from('booking')
+          .select('checkin_date,checkout_date')
+          console.log("SUPABASE DATA:", booking)     
+        console.log("KLIK")
+        if (error) {
+            console.error('Error fetching data:', error);
+            return;
+          }
+}
+
 const backgroundStyle = {
   backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
 };
@@ -55,6 +70,7 @@ const backgroundStyle = {
               backgroundColor: isDarkMode ? Colors.black : Colors.white,
             }}>
                 <Button title='Go to calendar' onPress={()=>navigation.navigate("CalendarScreen")}/>
+                <Button title='Fetch Data' onPress={()=>fetchData()}/>
             <Section title="Step One">
               Edit <Text style={styles.highlight}>App.tsx</Text> to change this
               screen and then come back to see your edits.
