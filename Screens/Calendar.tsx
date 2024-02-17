@@ -1,10 +1,27 @@
-import React from 'react'
-import { View, StyleSheet, Text } from 'react-native'
+import React, { useState } from 'react'
+import { View, StyleSheet, Text, Button } from 'react-native'
 import {  CalendarList } from 'react-native-calendars'
+import { supabase } from '../Supabase/supabase'
+
 function CalendarScreen() {
+    const [data,setData]=useState<any>()
+    const  fetchData=async()=>{   
+        let { data: booking, error } = await supabase
+              .from('booking')
+              .select('checkin_date,checkout_date')
+              console.log("SUPABASE DATA:", booking)     
+            console.log("KLIK")
+            setData(booking)            
+        if (error) {
+                console.error('Error fetching data:', error);
+                return;}}
+                
   return (
-    <View style={styles.container}>
-        <Text  style={styles.textcontainer}>Calendar</Text>
+    <View style={styles.container}> 
+        <View style={styles.topcontainer}>
+            <Text style={styles.textStyle}>djkasd</Text>
+            <Button title='Fetch Data' onPress={()=>fetchData()}/>
+        </View>
         <CalendarList
         onDayPress={day => {
             console.info(day);
@@ -32,8 +49,16 @@ const  styles = StyleSheet.create({
     container:{
         justifyContent:"center",
     },
-    textcontainer:{
-        height:50
+    topcontainer:{
+        height:100,
+        justifyContent:"center",
+        alignItems:"center",
+        backgroundColor:"lightpink",
+    },
+    textStyle:{
+        justifyContent:"center",
+        alignItems:"center",
+        backgroundColor:"red"
     }
 })
 

@@ -19,7 +19,10 @@ type SectionProps = PropsWithChildren<{
 const Stack = createNativeStackNavigator();
 
 function App(): React.JSX.Element {
-  
+
+
+//useEffect for initializing Supabase, is it necessary
+
   return (
     <NavigationContainer>
     <Stack.Navigator initialRouteName="HomeScreen">
