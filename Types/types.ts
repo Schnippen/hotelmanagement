@@ -18,5 +18,13 @@ export interface TBooking {
   num_children?: number; 
   booking_amount?: number; 
 }
-export type TBookingUpdated = TBooking & { difference_in_days?: number; reservation_dates?: string[] };
+export interface periods {
+  date: string;
+  startingDay: boolean;
+  endingDay: boolean;
+  color: string;
+}
+
+
+export type TBookingUpdated = TBooking & { difference_in_days?: number; reservation_dates: string[];reservation_period?:periods[] };
   

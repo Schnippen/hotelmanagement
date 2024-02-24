@@ -1,4 +1,4 @@
-import { TBooking } from "../Types/types";
+import { TBooking, TBookingUpdated } from "../Types/types";
 
 export const changeDateFormat=(date:string)=>{
     let dateToChange =date
@@ -47,36 +47,18 @@ export const changeDateFormat=(date:string)=>{
         });
       };
       
-     
-
-      export const calculateReservationDays2=(BookingData:TBooking[])=>{
-
-        let updatedData = updateDateFormat(BookingData)
-
-        updatedData.map(({ checkin_date, checkout_date, id }) => {
-          const checkinDate = new Date(checkin_date);
-          const checkoutDate = new Date(checkout_date);
-      
-          // Calculate the difference in days miliseconds seconds minute hours
-          const differenceInDays = Math.round((checkoutDate.getTime() - checkinDate.getTime()) / (1000 * 60 * 60 * 24));
-          // Create array of reservation days for caendar component to render
-          const reservationDates: string[] = [];
-        for (let i = 0; i <= differenceInDays; i++) {
-          const currentDate = new Date(checkinDate);
-          currentDate.setDate(checkinDate.getDate() + i);
-          reservationDates.push(currentDate.toISOString().split('T')[0]);
-        }
-         /* console.log({
-            ...{ checkin_date, checkout_date, id },
-            difference_in_days: differenceInDays,
-            reservation_dates: reservationDates
-          })  */
-          // Return the updated booking object
-          return {
-            ...{ checkin_date, checkout_date, id },
-            difference_in_days: differenceInDays,
-            reservation_dates: reservationDates
-          };
+      export const createReservationPeriod = (state: TBookingUpdated[]) => {
+        let color = 'red';
+        return state.map(({ id, reservation_dates }) => {
+          const periods = reservation_dates.map((date, index) => ({
+            date,
+            startingDay: index === 0,
+            endingDay: index === reservation_dates.length - 1,
+            color: color
+          }));
+          console.log("createReservationPeriod:",{ id, periods })
+          return { id, periods };
         });
       };
-     
+
+    
