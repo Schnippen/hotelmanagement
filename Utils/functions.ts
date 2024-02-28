@@ -18,6 +18,24 @@ export const changeDateFormat=(date:string)=>{
           checkout_date: changeDateFormat(item.checkout_date)
         }));
       };
+//TODO
+ //create object for bookings than can be later interpreted and rendered in Caendnar component
+        //add color argumenr, export that to function in futures
+        export const createReservationPeriod = (state: TBookingUpdated[]) => {
+            let color = 'red';
+            const updatedReservationPeriods= state.map(({ id, reservation_dates }) => {
+            const periods = reservation_dates.map((date, index) => ({
+                date,
+                startingDay: index === 0,
+                endingDay: index === reservation_dates.length - 1,
+                color: color
+            }));
+            console.log("createReservationPeriod:",{ id, periods })
+            return { id, periods };
+            });
+            return updatedReservationPeriods
+            //return setReservationPeriodsStates(updatedReservationPeriods);
+        };
 
 
       export const calculateReservationDays = (BookingData: TBooking[]) => {
@@ -46,30 +64,44 @@ export const changeDateFormat=(date:string)=>{
           };
         });
       };
-      
-      export const createReservationPeriod = (state: TBookingUpdated[]) => {
-        let color = 'red';
-        return state.map(({ id, reservation_dates }) => {
-          const periods = reservation_dates.map((date, index) => ({
-            date,
-            startingDay: index === 0,
-            endingDay: index === reservation_dates.length - 1,
-            color: color
-          }));
-          console.log("createReservationPeriod:",{ id, periods })
-          return { id, periods };
+        //TODO typescript the periods
+        //populates the calendar with objects created by function above to be rendered in Calendar Component
+    export const populateCalendar = (reservationPeriods: any) => {
+        console.log("populateCalendar() runs");
+    
+        // Check if reservationPeriods is null or empty
+       /*  if (!reservationPeriods || reservationPeriods.length === 0) {
+            console.log("populateCalendar(): reservationPeriods is null or empty, returning.");
+            return {};
+        } */
+        const markedDates: Record<string, { periods: any[] }> = {}; // Initialize markedDates object
+        // Iterate over each reservation period
+        reservationPeriods.forEach(({ id, periods }:{id:string,periods:any}) => {
+          // Iterate over each period in the reservation
+          periods.forEach(({ date, startingDay, endingDay, color }:{date:string, startingDay:string, endingDay:string, color:string }) => {
+            // Create or update the markedDates object with the current period
+            markedDates[date] = {
+              periods: [
+                ...(markedDates[date]?.periods || []), // Keep existing periods for the date
+                { startingDay, endingDay, color } // Add the new period
+              ]
+            };
+          });
         });
-      };
+        console.log("populateCalendar():",markedDates)
+        return markedDates
+    };
 
-    export const calculateCurrentDate=()=>{
-        // Create a new Date object
-        const currentDate = new Date();
-        // Get the year, month, and day from the Date object
-        const year = currentDate.getFullYear();
-        const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so we add 1
-        const day = String(currentDate.getDate()).padStart(2, '0');
-        // Format the date as "YYYY-MM-DD"
-        const formattedDate = `${year}-${month}-${day}`;
-        //console.log(formattedDate); 
-        return formattedDate
-    }
+          //this \/ is for creating transparent current date 
+          export const calculateCurrentDate=()=>{
+            // Create a new Date object
+            const currentDate = new Date();
+            // Get the year, month, and day from the Date object
+            const year = currentDate.getFullYear();
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so we add 1
+            const day = String(currentDate.getDate()).padStart(2, '0');
+            // Format the date as "YYYY-MM-DD"
+            const formattedDate = `${year}-${month}-${day}`;
+            //console.log(formattedDate); 
+            return formattedDate
+        }
