@@ -61,4 +61,15 @@ export const changeDateFormat=(date:string)=>{
         });
       };
 
-    
+    export const calculateCurrentDate=()=>{
+        // Create a new Date object
+        const currentDate = new Date();
+        // Get the year, month, and day from the Date object
+        const year = currentDate.getFullYear();
+        const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so we add 1
+        const day = String(currentDate.getDate()).padStart(2, '0');
+        // Format the date as "YYYY-MM-DD"
+        const formattedDate = `${year}-${month}-${day}`;
+        //console.log(formattedDate); 
+        return formattedDate
+    }
