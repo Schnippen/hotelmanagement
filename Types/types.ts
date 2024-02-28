@@ -17,6 +17,7 @@ export interface TBooking {
   num_adults?: number; 
   num_children?: number; 
   booking_amount?: number; 
+  booking_color?:string; //color of the booking in calendar
 }
 export interface periods {
   date: string;

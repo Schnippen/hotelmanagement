@@ -18,28 +18,10 @@ export const changeDateFormat=(date:string)=>{
           checkout_date: changeDateFormat(item.checkout_date)
         }));
       };
-//TODO
- //create object for bookings than can be later interpreted and rendered in Caendnar component
-        //add color argumenr, export that to function in futures
-        export const createReservationPeriod = (state: TBookingUpdated[]) => {
-            let color = 'red';
-            const updatedReservationPeriods= state.map(({ id, reservation_dates }) => {
-            const periods = reservation_dates.map((date, index) => ({
-                date,
-                startingDay: index === 0,
-                endingDay: index === reservation_dates.length - 1,
-                color: color
-            }));
-            console.log("createReservationPeriod:",{ id, periods })
-            return { id, periods };
-            });
-            return updatedReservationPeriods
-            //return setReservationPeriodsStates(updatedReservationPeriods);
-        };
 
 
       export const calculateReservationDays = (BookingData: TBooking[]) => {
-        return BookingData.map(({ checkin_date, checkout_date, id }) => {
+        return BookingData.map(({ checkin_date, checkout_date, id,booking_color }) => {
           const checkinDate = new Date(checkin_date);
           const checkoutDate = new Date(checkout_date);
       
@@ -60,20 +42,37 @@ export const changeDateFormat=(date:string)=>{
             checkin_date,
             checkout_date,
             difference_in_days: differenceInDays,
-            reservation_dates: reservationDates
+            reservation_dates: reservationDates,
+            booking_color,
           };
         });
       };
+
+//TODO
+ //create object for bookings than can be later interpreted and rendered in Caendnar component
+        //add color argumenr, export that to function in futures
+        export const createReservationPeriod = (state: TBookingUpdated[]) => {
+            //let color = 'red';
+            const updatedReservationPeriods= state.map(({ id, reservation_dates,booking_color }) => {
+            const periods = reservation_dates.map((date, index) => ({
+                date,
+                startingDay: index === 0,
+                endingDay: index === reservation_dates.length - 1,
+                color: booking_color?booking_color:randomHexColor
+            }));
+            console.log("createReservationPeriod:",{ id, periods })
+            return { id, periods };
+            });
+            return updatedReservationPeriods
+            //return setReservationPeriodsStates(updatedReservationPeriods);
+        };
+
+
         //TODO typescript the periods
         //populates the calendar with objects created by function above to be rendered in Calendar Component
     export const populateCalendar = (reservationPeriods: any) => {
         console.log("populateCalendar() runs");
     
-        // Check if reservationPeriods is null or empty
-       /*  if (!reservationPeriods || reservationPeriods.length === 0) {
-            console.log("populateCalendar(): reservationPeriods is null or empty, returning.");
-            return {};
-        } */
         const markedDates: Record<string, { periods: any[] }> = {}; // Initialize markedDates object
         // Iterate over each reservation period
         reservationPeriods.forEach(({ id, periods }:{id:string,periods:any}) => {
@@ -88,7 +87,7 @@ export const changeDateFormat=(date:string)=>{
             };
           });
         });
-        console.log("populateCalendar():",markedDates)
+        //console.log("populateCalendar():",markedDates)
         return markedDates
     };
 
@@ -104,4 +103,17 @@ export const changeDateFormat=(date:string)=>{
             const formattedDate = `${year}-${month}-${day}`;
             //console.log(formattedDate); 
             return formattedDate
+        }
+
+        const randomHexColor=getRandomHexColor()
+        function getRandomHexColor() {
+            // Generate random RGB values
+            const r = Math.floor(Math.random() * 256); // Red component
+            const g = Math.floor(Math.random() * 256); // Green component
+            const b = Math.floor(Math.random() * 256); // Blue component
+            
+            // Convert RGB to hexadecimal format
+            const hexColor = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+            
+            return hexColor;
         }

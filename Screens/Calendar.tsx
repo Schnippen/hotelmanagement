@@ -13,7 +13,7 @@ function CalendarScreen() {
       try {
         let { data: booking, error } = await supabase
           .from('booking')
-          .select('checkin_date, checkout_date, id');
+          .select('checkin_date, checkout_date, id, booking_color');
     
         console.log("SUPABASE DATA:", booking);
         console.log("KLIK");
