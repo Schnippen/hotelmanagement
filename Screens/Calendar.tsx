@@ -9,26 +9,29 @@ function CalendarScreen() {
     const [data,setData]=useState<TBookingUpdated[] | null>(null)
     const [reservationPeriodsStates, setReservationPeriodsStates] = useState<{ id: string; periods: periods[] }[] | null>(null);
     const [datesReady,setMarkedDates]=useState<any>(null)
+    const [loadingState,setLoadingState]=useState<boolean>(true)
+    const [errorState,setError]=useState<any>(null)
     const fetchData = async (): Promise<void> => {
       try {
+        setLoadingState(true)
         let { data: booking, error } = await supabase
           .from('booking')
           .select('checkin_date, checkout_date, id, booking_color');
     
-        console.log("SUPABASE DATA:", booking);
+        //console.log("SUPABASE DATA:", booking);
         console.log("KLIK");
 
         if (booking) {
           let updatedBookingFormatData = updateDateFormat(booking);
-          console.log("updatedBookingFormatData", updatedBookingFormatData)
+          //console.log("updatedBookingFormatData", updatedBookingFormatData)
           let bookingData = calculateReservationDays(updatedBookingFormatData);
-          console.info("BookingData:", bookingData);
+          //console.info("BookingData:", bookingData);
           setData(bookingData);
           let updatedReservationPeriods= createReservationPeriod(bookingData)
           //console.log("updatedReservationPeriods:",updatedReservationPeriods)          
           //setReservationPeriodsStates(updatedReservationPeriods)
           let popuatedCalendar = populateCalendar(updatedReservationPeriods)
-          console.log("populatedCalendar:",popuatedCalendar)
+          //console.log("populatedCalendar:",popuatedCalendar)
           setMarkedDates(popuatedCalendar)
           console.log("datesReady:",datesReady)
         } else {
@@ -37,11 +40,15 @@ function CalendarScreen() {
         if (error) {
           console.error('Error fetching data:', error);
           setData(null);
+          setError(error);
           return;
         }
       } catch (error) {
         console.error('Error fetching data:', error);
+        setError(error);
         setData(null);
+      }finally {
+        setLoadingState(false);
       }
     };
     
@@ -95,6 +102,10 @@ const shit = [
         showWeekNumbers
         markingType="multi-period"
         markedDates={{...markedDates}}
+        displayLoadingIndicator={loadingState}
+        enableSwipeMonths={true} //TODO make it a global setting
+        onDayPress={()=>console.log("onDayPress()")}
+        onDayLongPress={()=>console.log("onDayLongPress()")}
       />
 </View>
   )
