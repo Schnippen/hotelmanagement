@@ -39,7 +39,7 @@ type SectionProps = PropsWithChildren<{
 const isDarkMode = useColorScheme() === 'dark';
 
 
-const  fetchData=async()=>{   
+/* const  fetchData=async()=>{   
     let { data: booking, error } = await supabase
           .from('booking')
           .select('checkin_date,checkout_date')
@@ -49,7 +49,7 @@ const  fetchData=async()=>{
             console.error('Error fetching data:', error);
             return;
           }
-}
+} */
 
 const backgroundStyle = {
   backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
@@ -70,7 +70,7 @@ const backgroundStyle = {
               backgroundColor: isDarkMode ? Colors.black : Colors.white,
             }}>
                 <Button title='Go to calendar' onPress={()=>navigation.navigate("CalendarScreen")}/>
-                <Button title='Fetch Data' onPress={()=>fetchData()}/>
+                <Button title='Go to add booking' onPress={()=>navigation.navigate("AddBooking")}/>
             <Section title="Step One">
               Edit <Text style={styles.highlight}>App.tsx</Text> to change this
               screen and then come back to see your edits.

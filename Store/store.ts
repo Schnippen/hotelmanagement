@@ -1,10 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit'
 import counterSlice from './counterSlice'
-export default configureStore({
-  reducer: {
-    counter: counterSlice,
-  },
-})
+
+
+const store = configureStore({
+    reducer: {
+        counter: counterSlice,
+    },
+  })
+
+  export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch
+  export default store
 
 //TODO add typescript to redux
 /* // Infer the `RootState` and `AppDispatch` types from the store itself

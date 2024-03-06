@@ -13,6 +13,7 @@ import HomeScreen from './Screens/Home';
 import CalendarScreen from './Screens/Calendar';
 import store from './Store/store';
 import { Provider } from 'react-redux';
+import AddBooking from './Screens/AddBooking';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -31,6 +32,7 @@ function App(): React.JSX.Element {
         <Stack.Navigator initialRouteName="HomeScreen">
           <Stack.Screen name="HomeScreen" component={HomeScreen} />
           <Stack.Screen name="CalendarScreen" component={CalendarScreen} />
+          <Stack.Screen name="AddBooking" component={AddBooking} />
         </Stack.Navigator>
       </NavigationContainer>
   </Provider>
