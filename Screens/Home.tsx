@@ -1,11 +1,10 @@
 import React, { PropsWithChildren } from 'react'
-import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View, useColorScheme } from 'react-native'
+import { Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View, useColorScheme } from 'react-native'
 import { Colors, Header, ReloadInstructions, DebugInstructions, LearnMoreLinks } from 'react-native/Libraries/NewAppScreen';
 import { supabase } from '../Supabase/supabase';
 //import { supabase } from '../Supabase/supabase';
 import { Button } from '@rneui/base';
 import { Icon } from '@rneui/themed';
-
 
 function HomeScreen({navigation}:any) {
 
@@ -52,10 +51,13 @@ const isDarkMode = useColorScheme() === 'dark';
             return;
           }
 } */
-
+//name={`${OS ? "ios" : "md"}-stepforward`}
+let OS = Platform.OS ==="ios"
 const backgroundStyle = {
   backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
 };
+const myIcon = <Icon name="rocket" size={30} color="#900" />;
+
   return (
     
       <SafeAreaView style={backgroundStyle}>
@@ -71,18 +73,18 @@ const backgroundStyle = {
             style={{
               backgroundColor: isDarkMode ? Colors.black : Colors.white,
             }}>
-                <Button title='Go to calendar' onPress={()=>navigation.navigate("CalendarScreen")}/>
-                <Button title='Go to add booking' onPress={()=>navigation.navigate("AddBooking")}/>
-                <Button title='Go to BookingDetails' onPress={()=>navigation.navigate("BookingDetails")}/>
-                <Button title='Go to Settings screen' onPress={()=>navigation.navigate("Settings")}/>
-                <Button radius={"sm"} type="solid">
+                <Button title='Go to calendar' onPress={()=>navigation.navigate("CalendarScreen")} style={styles.buttonStyle}/>
+                <Button title='Go to add booking' onPress={()=>navigation.navigate("AddBooking")} style={styles.buttonStyle}/>
+                <Button title='Go to BookingDetails' onPress={()=>navigation.navigate("BookingDetails")} style={styles.buttonStyle}/>
+                <Button onPress={()=>navigation.navigate("Settings")} radius={"md"} size="sm" type="outline" style={{marginVertical:8,justifyContent:'center'}}>
                 Go to Settings screen
                 <Icon
-          name="react"
-          size={15}
-          color="#0FF"
-        />
+                name={`settings`}
+                size={20}
+                color="black"
+                />
                 </Button>
+                {myIcon}
             <Section title="Step One">
               Edit <Text style={styles.highlight}>App.tsx</Text> to change this
               screen and then come back to see your edits.
@@ -116,6 +118,9 @@ const styles = StyleSheet.create({
     highlight: {
       fontWeight: '700',
     },
+    buttonStyle:{
+      marginVertical:8,
+    }
   });
   
 
