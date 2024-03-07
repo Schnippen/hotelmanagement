@@ -29,3 +29,12 @@ export interface periods {
 
 export type TBookingUpdated = TBooking & { difference_in_days?: number; reservation_dates: string[];reservation_period?:periods[] };
   
+export type TCalendarBooking={
+  id: string;
+  periods: {
+      color: string;
+      date: string;
+      endingDay: boolean;
+      startingDay: boolean;
+  }[];
+}[]

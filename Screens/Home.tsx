@@ -1,8 +1,10 @@
 import React, { PropsWithChildren } from 'react'
-import { Button, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View, useColorScheme } from 'react-native'
+import { SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View, useColorScheme } from 'react-native'
 import { Colors, Header, ReloadInstructions, DebugInstructions, LearnMoreLinks } from 'react-native/Libraries/NewAppScreen';
 import { supabase } from '../Supabase/supabase';
 //import { supabase } from '../Supabase/supabase';
+import { Button } from '@rneui/base';
+import { Icon } from '@rneui/themed';
 
 
 function HomeScreen({navigation}:any) {
@@ -71,6 +73,16 @@ const backgroundStyle = {
             }}>
                 <Button title='Go to calendar' onPress={()=>navigation.navigate("CalendarScreen")}/>
                 <Button title='Go to add booking' onPress={()=>navigation.navigate("AddBooking")}/>
+                <Button title='Go to BookingDetails' onPress={()=>navigation.navigate("BookingDetails")}/>
+                <Button title='Go to Settings screen' onPress={()=>navigation.navigate("Settings")}/>
+                <Button radius={"sm"} type="solid">
+                Go to Settings screen
+                <Icon
+          name="react"
+          size={15}
+          color="#0FF"
+        />
+                </Button>
             <Section title="Step One">
               Edit <Text style={styles.highlight}>App.tsx</Text> to change this
               screen and then come back to see your edits.
@@ -78,12 +90,7 @@ const backgroundStyle = {
             <Section title="See Your Changes">
               <ReloadInstructions />
             </Section>
-            <Section title="Debug">
-              <DebugInstructions />
-            </Section>
-            <Section title="Learn More">
-              Read the docs to discover what to do next:
-            </Section>
+            
             <LearnMoreLinks />
           </View>
         </ScrollView>
