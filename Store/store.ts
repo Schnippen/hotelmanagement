@@ -1,12 +1,14 @@
 import { configureStore } from '@reduxjs/toolkit'
 import counterSlice from './counterSlice'
 import { calendarDataSlice } from './calendarData'
+import createCurrentISODate from './Reducers/createCurrentISODate'
 
 
 const store = configureStore({
     reducer: {
         counter: counterSlice,
         calendarData:calendarDataSlice.reducer,
+        currentISODate:createCurrentISODate
     },
   })
 
