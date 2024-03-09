@@ -8,8 +8,6 @@ import { RootState } from '../Store/store';
 //TODO use react elements, try to use some kind of form library
 function AddBooking() {
 //const [state,setState]=useState(0)
-
-
 //const count = useSelector((state) => state.counter.value)
 const count = useSelector((state:RootState) => state.counter.value)
 

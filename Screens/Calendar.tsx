@@ -36,6 +36,7 @@ function CalendarScreen({navigation}:any) { //TODO add typescript to navigation
           let popuatedCalendar = populateCalendar(updatedReservationPeriods)
           //console.log("populatedCalendar:",popuatedCalendar)
           setMarkedDates(popuatedCalendar)
+          //TODO use redux here with calendarData
           console.log("datesReady:",datesReady)
         } else {
           console.error('No booking data found.');
@@ -118,7 +119,7 @@ const navigateToDayDetails=(day:string)=>{
   const selectedDay:string=day
   if(checkDayReservation(selectedDay,globalCalendarData)){
     console.info("navigating")
-    navigation.navigate("BookingDetails")
+    navigation.navigate("BookingDetails",{selectedDay:selectedDay})
   }else{
     console.info("not navigating")
   }
@@ -133,7 +134,7 @@ const navigateToDayDetails=(day:string)=>{
             <Button title='populateCalendar()' onPress={()=>{dispatch(UPDATE_STATE(shit2)),setMarkedDates(shit2)}}/> 
         </View>
       <Calendar
-        showWeekNumbers
+        showWeekNumbers={false}
         markingType="multi-period"
         markedDates={{...markedDates}}
         displayLoadingIndicator={loadingState}

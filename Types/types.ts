@@ -26,7 +26,7 @@ export interface periods {
   color: string;
 }
 
-
+//used in calendarScreen
 export type TBookingUpdated = TBooking & { difference_in_days?: number; reservation_dates: string[];reservation_period?:periods[] };
   
 export type TCalendarBooking={
@@ -38,3 +38,16 @@ export type TCalendarBooking={
       startingDay: boolean;
   }[];
 }[]
+
+//used in BookingDetailsScreen
+export type TBookingDetails= TBooking & {  payment_status: {
+  id?: number;
+  payment_status_name: string;
+};
+booking_room: {
+  room_id: {
+      status_id: {
+          status_name: string;
+      };
+  };
+}; };
