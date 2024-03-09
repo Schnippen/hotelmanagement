@@ -1,4 +1,4 @@
-import { TBooking, TBookingUpdated } from "./types"
+import { TBooking, TBookingDetails, TBookingUpdated } from "./types"
 
  let mockupData=[{"checkin_date": "2024-02-20T00:00:00+00:00", "checkout_date": "2024-02-25T00:00:00+00:00", "id": "3134840e-7e5e-4623-bc76-a57228f53d5f"}, {"checkin_date": "2024-03-01T00:00:00+00:00", "checkout_date": "2024-03-07T00:00:00+00:00", "id": "4e39c081-6889-45ba-b02b-ba42e55bb5c5"}, {"checkin_date": "2024-04-10T00:00:00+00:00", "checkout_date": "2024-04-15T00:00:00+00:00", "id": "9daa7c6e-804b-4e45-8c35-9351512bdf00"}]
   
@@ -38,3 +38,28 @@ const populatingCalendarMOCKUP={
 
 
     export const MOCKUPbookingDetailsFETCHdata=[{"booking_amount": 600, "booking_color": "green", "checkin_date": "2024-03-10T01:00:00+00:00", "checkout_date": "2024-03-15T01:00:00+00:00", "guest_id": "291296af-e887-4514-b941-e61865e9ec56", "id": "9daa7c6e-804b-4e45-8c35-9351512bdf00", "num_adults": 2, "num_children": 2, "payment_status_id": 3}]
+
+    let MockupbookingDetails:TBookingDetails[] = [
+      {
+        "id": "4e39c081-6889-45ba-b02b-ba42e55bb5c5",
+        "guest_id": "278f8945-f6cd-4ef5-b070-91d24eb9c28d",
+        "payment_status_id": 2,
+        "checkin_date": "2024-03-01T00:00:00+00:00",
+        "checkout_date": "2024-03-07T00:00:00+00:00",
+        "num_adults": 1,
+        "num_children": 1,
+        "booking_amount": 400,
+        "booking_color": "#5f4868",
+        "payment_status": {
+          "id": 2,
+          "payment_status_name": "Pending"
+        },
+        "booking_room": {
+          "room_id": {
+            "status_id": {
+              "status_name": "Available"
+            }
+          }
+        }
+      }
+    ]

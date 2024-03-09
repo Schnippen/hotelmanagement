@@ -7,6 +7,7 @@ import { MOCKUPbookingDetailsFETCHdata } from '../Types/mockup';
 import { useSelector } from 'react-redux';
 import { RootState } from '../Store/store';
 import { changeDateFormat } from '../Utils/functions';
+import BookingDetailsListItem from '../Components/BookingDetailsListItem';
 function BookingDetails({navigation,route}:any) {
 
   
@@ -47,7 +48,7 @@ let exampleData:TBooking[]=[{"booking_amount": 400, "booking_color": "#5f4868", 
 /* .select('booking_amount,booking_color,checkin_date,checkout_date,guest_id,id,num_adults,num_children, payment_status(id,payment_status_name)') */
 //payment_status(*),booking_room(room_id(*))
 
-let chuj:TBookingDetails[] = [
+let MockupbookingDetails:TBookingDetails[] = [
   {
     "id": "4e39c081-6889-45ba-b02b-ba42e55bb5c5",
     "guest_id": "278f8945-f6cd-4ef5-b070-91d24eb9c28d",
@@ -71,10 +72,11 @@ let chuj:TBookingDetails[] = [
     }
   }
 ]
-const List = ({ state }: { state: TBooking[] | null }) => {
+const List = ({ state }: { state: TBookingDetails[] | null }) => {
   
   return state && state.length > 0 ? (
     state.map((item: any, index: number) => (
+      <>
       <View key={index}>
         <Text>Index: {index}</Text>
         <Text>booking_amount: {item.booking_amount}</Text>
@@ -90,6 +92,8 @@ const List = ({ state }: { state: TBooking[] | null }) => {
         <Text>status of booking??? </Text>
         <Text>CLICK FOR MORE DETAILS???</Text>
       </View>
+      <BookingDetailsListItem BookingDetails={}/>
+      </>
     ))
   ) : (
     <View>
@@ -117,9 +121,9 @@ const List = ({ state }: { state: TBooking[] | null }) => {
               }}
               titleStyle={{ fontWeight: 'bold' }}
             />
-            <Button type='outline' title={"ISO TIME"} onPress={()=>console.log("hello")}></Button>
+            <Button type='outline' title={"local dataa"} onPress={()=>console.log("dsas")}></Button>
             <Text>On THIS DAy you havee reserved:</Text>
-            <List state={state}/>
+            <List state={MockupbookingDetails}/>
    </View>
   )
 }
