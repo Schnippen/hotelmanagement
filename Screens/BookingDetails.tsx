@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Text, View } from 'react-native'
+import { ScrollView, Text, View } from 'react-native'
 import { supabase } from '../Supabase/supabase'
 import { Button } from '@rneui/base';
 import { TBooking, TBookingDetails } from '../Types/types';
@@ -75,7 +75,7 @@ let MockupbookingDetails:TBookingDetails[] = [
 const List = ({ state }: { state: TBookingDetails[] | null }) => {
   
   return state && state.length > 0 ? (
-    state.map((item: any, index: number) => (
+    state.map((item: TBookingDetails, index: number) => (
       <>
       <View key={index}>
         <Text>Index: {index}</Text>
@@ -88,11 +88,11 @@ const List = ({ state }: { state: TBookingDetails[] | null }) => {
         <Text>num_adults: {item.num_adults}</Text>
         <Text>checkin_date: {item.checkin_date}</Text>
         <Text>payment_status_id: {item.payment_status.payment_status_name}</Text>
-        <Text>payment_status_id: {item.booking_room.room_id.status_id.status_name}</Text>
+        <Text>room_status_id: {item.booking_room.room_id.status_id.status_name}</Text>
         <Text>status of booking??? </Text>
         <Text>CLICK FOR MORE DETAILS???</Text>
       </View>
-      <BookingDetailsListItem BookingDetails={}/>
+      <BookingDetailsListItem item={item} key={item.id}/>
       </>
     ))
   ) : (
@@ -104,8 +104,9 @@ const List = ({ state }: { state: TBookingDetails[] | null }) => {
 
 
   return (
-    <View>
+    <ScrollView>
         <Text>Booking Details {selectedDay}</Text>
+        <Text>Bookings on this day:</Text>
         <Button onPress={()=>fetchData()}
               title="fetch data"
               buttonStyle={{
@@ -124,7 +125,7 @@ const List = ({ state }: { state: TBookingDetails[] | null }) => {
             <Button type='outline' title={"local dataa"} onPress={()=>console.log("dsas")}></Button>
             <Text>On THIS DAy you havee reserved:</Text>
             <List state={MockupbookingDetails}/>
-   </View>
+   </ScrollView>
   )
 }
 
