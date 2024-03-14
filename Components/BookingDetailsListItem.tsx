@@ -123,6 +123,18 @@ const GuestName=()=>{
   )
 }
 
+const BookingPrice=()=>{
+  const price= item.booking_amount?item.booking_amount:null
+  return item.booking_amount? (
+    <View style={{width:"100%",alignItems:"center",flexDirection:"column"}}>
+        <Text  style={{alignSelf:"center",marginVertical:4}}>Booking Price:</Text>
+        <View style={{width:"100%",justifyContent:"center",flexDirection:"row"}}>
+       <Text >{price} </Text>
+     </View>
+      </View>
+  ):null
+}
+
   return (
     <Card>
         <GuestName/>
@@ -134,6 +146,8 @@ const GuestName=()=>{
        <RoomStatus/> 
         <Card.Divider />
         <PaymentStatus/>
+        <Card.Divider /> 
+        <BookingPrice/>
         <Card.Divider /> 
         <MoreInfo/> 
     </Card>

@@ -11,7 +11,7 @@ import BookingDetailsListItem from '../Components/BookingDetailsListItem';
 function BookingDetails({navigation,route}:any) {
 
   
-const [state,setState]=useState<any>(null)
+const [state,setState]=useState<TBookingDetails[]|null>(null)
 
 const {selectedDay}= route.params //selectedDay from previous screen  
 console.log("params",selectedDay)
@@ -40,7 +40,7 @@ const fetchData= async ()=>{
     return error
   }
 }
-/* let exampleData:TBooking[]=[{"booking_amount": 400, "booking_color": "#5f4868", "checkin_date": "2024-03-01T00:00:00+00:00", "checkout_date": "2024-03-07T00:00:00+00:00", "guest_id": "278f8945-f6cd-4ef5-b070-91d24eb9c28d", "id": "4e39c081-6889-45ba-b02b-ba42e55bb5c5", "num_adults": 1, "num_children": 1, "payment_status_id": 2}]  */
+
 
 // working on fetch
 'booking_amount,booking_color,checkin_date,checkout_date,guest_id,id,num_adults,num_children,payment_status_id' 
@@ -75,7 +75,6 @@ let MockupbookingDetails: TBookingDetails[] = [
   }
 ];
 const List = ({ state }: { state: TBookingDetails[] | null }) => {
-  
   return state && state.length > 0 ? (
     state.map((item: TBookingDetails, index: number) => (
       <BookingDetailsListItem item={item} key={item.id}/>
@@ -88,7 +87,7 @@ const List = ({ state }: { state: TBookingDetails[] | null }) => {
 };
 
 //TODO use correct english terms for bookings
-
+//TODO add skeleton
   return (
     <View>
         
@@ -110,11 +109,11 @@ const List = ({ state }: { state: TBookingDetails[] | null }) => {
             <Text h3 style={{alignSelf:"center"}}>Bookings on this day:</Text>
             <Text h4 style={{alignSelf:"center",marginVertical:4}}>{selectedDay}</Text>
             <FlatList  
-  style={{backgroundColor:"red",height:"100%"}}
-  data={state}
-  keyExtractor={(item) => item.id}
-  renderItem={({ item }) => <BookingDetailsListItem item={item} />}
-/>
+              style={{backgroundColor:"red",height:"100%"}}
+              data={state}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => <BookingDetailsListItem item={item} />}
+            />
       {/* <List state={MockupbookingDetails}/> */}
    </View>
   )

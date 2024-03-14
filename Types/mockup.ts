@@ -1,4 +1,4 @@
-import { TBooking, TBookingDetails, TBookingUpdated } from "./types"
+import { TBooking, TBookingDetails, TBookingUpdated, TRoom } from "./types"
 
  let mockupData=[{"checkin_date": "2024-02-20T00:00:00+00:00", "checkout_date": "2024-02-25T00:00:00+00:00", "id": "3134840e-7e5e-4623-bc76-a57228f53d5f"}, {"checkin_date": "2024-03-01T00:00:00+00:00", "checkout_date": "2024-03-07T00:00:00+00:00", "id": "4e39c081-6889-45ba-b02b-ba42e55bb5c5"}, {"checkin_date": "2024-04-10T00:00:00+00:00", "checkout_date": "2024-04-15T00:00:00+00:00", "id": "9daa7c6e-804b-4e45-8c35-9351512bdf00"}]
   
@@ -39,27 +39,65 @@ const populatingCalendarMOCKUP={
 
     export const MOCKUPbookingDetailsFETCHdata=[{"booking_amount": 600, "booking_color": "green", "checkin_date": "2024-03-10T01:00:00+00:00", "checkout_date": "2024-03-15T01:00:00+00:00", "guest_id": "291296af-e887-4514-b941-e61865e9ec56", "id": "9daa7c6e-804b-4e45-8c35-9351512bdf00", "num_adults": 2, "num_children": 2, "payment_status_id": 3}]
 
-    let MockupbookingDetails:TBookingDetails[] = [
+    let MockupbookingDetails: TBookingDetails[] = [
       {
-        "id": "4e39c081-6889-45ba-b02b-ba42e55bb5c5",
-        "guest_id": "278f8945-f6cd-4ef5-b070-91d24eb9c28d",
-        "payment_status_id": 2,
-        "checkin_date": "2024-03-01T00:00:00+00:00",
-        "checkout_date": "2024-03-07T00:00:00+00:00",
-        "num_adults": 1,
-        "num_children": 1,
-        "booking_amount": 400,
-        "booking_color": "#5f4868",
-        "payment_status": {
-          "id": 2,
-          "payment_status_name": "Pending"
+        id: '9daa7c6e-804b-4e45-8c35-9351512bdf00',
+        payment_status_id: 3,
+        checkin_date: '2024-03-10T01:00:00+00:00',
+        checkout_date: '2024-03-15T01:00:00+00:00',
+        num_adults: 2,
+        num_children: 2,
+        booking_amount: 600,
+        booking_color: 'green',
+        payment_status: {
+          payment_status_name: 'Cancelled',
         },
-        "booking_room": {
-          "room_id": {
-            "status_id": {
-              "status_name": "Available"
-            }
-          }
-        }
+        booking_room: {
+          room_id: {
+            status_id: {
+              status_name: 'Under Maintenance',
+            },
+          },
+        },
+        guest_id: {
+          last_name: "Powers",
+          first_name: "Austin",
+        },
+      }
+    ];
+
+    let mockupRoomsData:TRoom[]=[
+      {
+        "id": "4fac5959-62c8-41a8-855a-e149e4fc6c76",
+        "floor_id": 4,
+        "room_class_id": {
+          "class_name": "Deluxe"
+        },
+        "status_id": {
+          "status_name": "Occupied"
+        },
+        "room_number": "2"
+      },
+      {
+        "id": "0fad24a2-035e-4d12-9964-9ba84b4373c2",
+        "floor_id": 5,
+        "room_class_id": {
+          "class_name": "Standard"
+        },
+        "status_id": {
+          "status_name": "Available"
+        },
+        "room_number": "1"
+      },
+      {
+        "id": "b79b8ae7-e19a-4485-8f03-4215b943aca6",
+        "floor_id": 6,
+        "room_class_id": {
+          "class_name": "Suite"
+        },
+        "status_id": {
+          "status_name": "Under Maintenance"
+        },
+        "room_number": "3"
       }
     ]

@@ -133,8 +133,7 @@ export const changeDateFormat=(date:string)=>{
       //console.log(differenceDays); // Output the difference in days
       
       const today = "Today" //TODO language change in future
-      
-      const result= differenceDays > 0
+      const result=differenceDays===1?"Tommorrow": differenceDays > 1
       ? differenceDays + " days in the future"
       : differenceDays === 0
         ? "Today"

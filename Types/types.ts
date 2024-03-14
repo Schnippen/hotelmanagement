@@ -59,5 +59,18 @@ export type TBookingDetails = TBooking & {
       };
     };
   };
-
 };
+
+export interface TRoom {
+  id: string;
+  floor_id: {
+    floor_number: string;
+  };
+  room_class_id: {
+    class_name: string;
+  };
+  status_id: {
+    status_name: string;
+  };
+  room_number: string;
+}
