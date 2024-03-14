@@ -11,7 +11,7 @@ function BookingDetailsListItem({ item }: { item: TBookingDetails }) {
 
   const BookingColor = () => {
     return item.booking_color ? (
-      <View style={{ width: '90%', height: 40, backgroundColor: item.booking_color }}></View>
+      <View style={{ width:'100%', height: 40, backgroundColor: item.booking_color}}></View>
     ) : null;
   };
   
@@ -26,7 +26,7 @@ function BookingDetailsListItem({ item }: { item: TBookingDetails }) {
       raised
       titleStyle={{ color: 'rgba(78, 116, 289, 1)' }}
       containerStyle={{
-        width: "90%",
+        width: "100%",
         marginHorizontal:0,
         marginVertical: 16,
       }}
@@ -46,10 +46,14 @@ function BookingDetailsListItem({ item }: { item: TBookingDetails }) {
       )
     }
     return(
-      <View style={{width:"100%",alignItems:"center",flexDirection:"row"}}>
-        <Text h4>Room status: {status} </Text>
+      <View style={{width:"100%",alignItems:"center",flexDirection:"column"}}>
+        <Text  style={{alignSelf:"center",marginVertical:4}}>Room status:</Text>
+        <View style={{width:"100%",justifyContent:"center",flexDirection:"row"}}>
+       <Text >{status} </Text>
         <Dot status={status}/>
+     </View>
       </View>
+
     )
   }
 
@@ -65,9 +69,12 @@ function BookingDetailsListItem({ item }: { item: TBookingDetails }) {
       )
     }
     return(
-      <View style={{width:"100%",alignItems:"center",flexDirection:"row"}}>
-        <Text h4>Payment status: {status} </Text>
+      <View style={{width:"100%",alignItems:"center",flexDirection:"column"}}>
+        <Text  style={{alignSelf:"center",marginVertical:4}}>Payment status:</Text>
+        <View style={{width:"100%",justifyContent:"center",flexDirection:"row"}}>
+        <Text >{status} </Text>
         <Dot status={status}/>
+        </View>
       </View>
     )
   }
@@ -82,49 +89,53 @@ const differenceDays =subtractDates(currentISODate,checkout_date)
  const BookingDuration=()=>{
   return(
     <View style={{width:"100%"}}>
-    <Text h3 style={{alignSelf:"center",marginVertical:8}}>Booking duration</Text>
-    <Text h4 style={styles.textStyle}>Check in: {checkin_date}</Text>
-    <Text h4 style={styles.textStyle}>Check out: {checkout_date}</Text>
-    <Text h4 style={styles.textStyle}>Days until check-out: {differenceDays}</Text>
+    <Text  style={{alignSelf:"center",marginVertical:4}}>Booking duration</Text>
+    <Text  style={styles.textStyle}>Check in: {checkin_date}</Text>
+    <Text  style={styles.textStyle}>Check out: {checkout_date}</Text>
+    <Text style={styles.textStyle}>Days until check-out: {differenceDays}</Text>
     </View>
   )
  }
  const NumberOfGuests = () => {
   const { num_adults, num_children } = item;
-
   return (
     <View style={{ width: '100%' }}>
-      <Text h3 style={{ alignSelf: 'center', marginVertical: 8 }}>
-        Number of Guests
+      <Text  style={{ alignSelf: 'center', marginVertical: 4 }}>
+        Number of Guests:
       </Text>
-      {num_adults && num_adults > 0 && (
-        <Text h4>Adults: {num_adults}</Text>
+      {!!num_adults && num_adults > 0 && (
+        <Text>Adults: {num_adults}</Text>
       )}
-      {num_children && num_children > 0 && (
-        <Text h4>Children: {num_children}</Text>
-      )}
+      {!!num_children && num_children > 0 && (
+        <Text>Children: {num_children}</Text>
+      )} 
     </View>
   );
 };
-
+//const fullName=item.guest_id.first_name&&item.guest_id.last_name?item.guest_id.first_name +" "+item.guest_id.last_name:null
+const GuestName=()=>{
+  const first_name=item.guest_id.first_name
+  const last_name=item.guest_id.last_name
+  return(
+    <View style={{width:"100%",alignItems:'center'}}>
+      <Text h4 style={styles.textStyle}>{first_name+" "+last_name}</Text>
+    </View>
+  )
+}
 
   return (
     <Card>
-         <Card.Title h3>room name</Card.Title>
+        <GuestName/>
          <BookingColor/>
-        <Text>
-        {item.id}
-        </Text>
         <Card.Divider />
         <BookingDuration/>
         <Card.Divider />
-        <NumberOfGuests/>
-        <Card.Divider />
-        <RoomStatus/>
+         <NumberOfGuests/>
+       <RoomStatus/> 
         <Card.Divider />
         <PaymentStatus/>
-        <Card.Divider />
-        <MoreInfo/>
+        <Card.Divider /> 
+        <MoreInfo/> 
     </Card>
   )
 }
@@ -133,6 +144,6 @@ export default BookingDetailsListItem
 
 const styles = StyleSheet.create({
   textStyle: {
-    marginVertical: 8,
+    marginVertical: 4,
   },
 });

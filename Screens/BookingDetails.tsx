@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { ScrollView, Text, View } from 'react-native'
+import { FlatList, ScrollView, View } from 'react-native'
 import { supabase } from '../Supabase/supabase'
-import { Button } from '@rneui/base';
+import { Button ,Text} from '@rneui/base';
 import { TBooking, TBookingDetails } from '../Types/types';
 import { MOCKUPbookingDetailsFETCHdata } from '../Types/mockup';
 import { useSelector } from 'react-redux';
@@ -18,13 +18,13 @@ console.log("params",selectedDay)
 //2024-03-05
 
 const formattedSelectedDay = `${selectedDay}T00:00:00Z`
-
+//TODO fetch data on first screen render with react querry
 const fetchData= async ()=>{
   try {
     console.log("trying to fetch")
     let { data: booking, error } = await supabase
     .from('booking')
-    .select('*,payment_status(payment_status_name), booking_room(room_id(status_id(status_name)))')
+    .select('*,payment_status(payment_status_name), booking_room(room_id(status_id(status_name))),guest_id(first_name,last_name)')
     .filter('checkin_date', 'lte', formattedSelectedDay)
     .filter('checkout_date', 'gte', formattedSelectedDay)
 
@@ -40,60 +40,45 @@ const fetchData= async ()=>{
     return error
   }
 }
-let exampleData:TBooking[]=[{"booking_amount": 400, "booking_color": "#5f4868", "checkin_date": "2024-03-01T00:00:00+00:00", "checkout_date": "2024-03-07T00:00:00+00:00", "guest_id": "278f8945-f6cd-4ef5-b070-91d24eb9c28d", "id": "4e39c081-6889-45ba-b02b-ba42e55bb5c5", "num_adults": 1, "num_children": 1, "payment_status_id": 2}] 
+/* let exampleData:TBooking[]=[{"booking_amount": 400, "booking_color": "#5f4868", "checkin_date": "2024-03-01T00:00:00+00:00", "checkout_date": "2024-03-07T00:00:00+00:00", "guest_id": "278f8945-f6cd-4ef5-b070-91d24eb9c28d", "id": "4e39c081-6889-45ba-b02b-ba42e55bb5c5", "num_adults": 1, "num_children": 1, "payment_status_id": 2}]  */
 
 // working on fetch
 'booking_amount,booking_color,checkin_date,checkout_date,guest_id,id,num_adults,num_children,payment_status_id' 
 //'booking_room(room_id(status_id(status_name)))'
 /* .select('booking_amount,booking_color,checkin_date,checkout_date,guest_id,id,num_adults,num_children, payment_status(id,payment_status_name)') */
-//payment_status(*),booking_room(room_id(*))
+//payment_status(*),booking_room(room_id(*)) guest_id(first_name,first_name)
 
-let MockupbookingDetails:TBookingDetails[] = [
+let MockupbookingDetails: TBookingDetails[] = [
   {
-    "id": "4e39c081-6889-45ba-b02b-ba42e55bb5c5",
-    "guest_id": "278f8945-f6cd-4ef5-b070-91d24eb9c28d",
-    "payment_status_id": 2,
-    "checkin_date": "2024-03-01T00:00:00+00:00",
-    "checkout_date": "2024-03-07T00:00:00+00:00",
-    "num_adults": 1,
-    "num_children": 1,
-    "booking_amount": 400,
-    "booking_color": "#5f4868",
-    "payment_status": {
-      "id": 2,
-      "payment_status_name": "Pending"
+    id: '9daa7c6e-804b-4e45-8c35-9351512bdf00',
+    payment_status_id: 3,
+    checkin_date: '2024-03-10T01:00:00+00:00',
+    checkout_date: '2024-03-15T01:00:00+00:00',
+    num_adults: 2,
+    num_children: 2,
+    booking_amount: 600,
+    booking_color: 'green',
+    payment_status: {
+      payment_status_name: 'Cancelled',
     },
-    "booking_room": {
-      "room_id": {
-        "status_id": {
-          "status_name": "Available"
-        }
-      }
-    }
+    booking_room: {
+      room_id: {
+        status_id: {
+          status_name: 'Under Maintenance',
+        },
+      },
+    },
+    guest_id: {
+      last_name: "Powers",
+      first_name: "Austin",
+    },
   }
-]
+];
 const List = ({ state }: { state: TBookingDetails[] | null }) => {
   
   return state && state.length > 0 ? (
     state.map((item: TBookingDetails, index: number) => (
-      <>
-      <View key={index}>
-        <Text>Index: {index}</Text>
-        <Text>booking_amount: {item.booking_amount}</Text>
-        <Text>booking_color: {item.booking_color}</Text>
-        <Text>checkin_date: {changeDateFormat(item.checkin_date)}</Text>
-        <Text>checkout_date: {changeDateFormat(item.checkout_date)}</Text>
-        <Text>guest_id: {item.guest_id}</Text>
-        <Text>id: {item.id}</Text>
-        <Text>num_adults: {item.num_adults}</Text>
-        <Text>checkin_date: {item.checkin_date}</Text>
-        <Text>payment_status_id: {item.payment_status.payment_status_name}</Text>
-        <Text>room_status_id: {item.booking_room.room_id.status_id.status_name}</Text>
-        <Text>status of booking??? </Text>
-        <Text>CLICK FOR MORE DETAILS???</Text>
-      </View>
       <BookingDetailsListItem item={item} key={item.id}/>
-      </>
     ))
   ) : (
     <View>
@@ -102,11 +87,11 @@ const List = ({ state }: { state: TBookingDetails[] | null }) => {
   );
 };
 
+//TODO use correct english terms for bookings
 
   return (
-    <ScrollView>
-        <Text>Booking Details {selectedDay}</Text>
-        <Text>Bookings on this day:</Text>
+    <View>
+        
         <Button onPress={()=>fetchData()}
               title="fetch data"
               buttonStyle={{
@@ -122,10 +107,16 @@ const List = ({ state }: { state: TBookingDetails[] | null }) => {
               }}
               titleStyle={{ fontWeight: 'bold' }}
             />
-            <Button type='outline' title={"local dataa"} onPress={()=>console.log("dsas")}></Button>
-            <Text>On THIS DAy you havee reserved:</Text>
-            <List state={MockupbookingDetails}/>
-   </ScrollView>
+            <Text h3 style={{alignSelf:"center"}}>Bookings on this day:</Text>
+            <Text h4 style={{alignSelf:"center",marginVertical:4}}>{selectedDay}</Text>
+            <FlatList  
+  style={{backgroundColor:"red",height:"100%"}}
+  data={state}
+  keyExtractor={(item) => item.id}
+  renderItem={({ item }) => <BookingDetailsListItem item={item} />}
+/>
+      {/* <List state={MockupbookingDetails}/> */}
+   </View>
   )
 }
 
