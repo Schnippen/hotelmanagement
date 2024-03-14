@@ -10,13 +10,17 @@ export type StackTypes= {
 // Fetching data
 export interface TBooking {
   id: string;
-  guest_id?: string; 
+  guest_id?: {
+    last_name: string|undefined;
+    first_name: string|undefined;
+  }; 
   payment_status_id?: number;
   checkin_date: string; 
   checkout_date: string;
   num_adults?: number; 
   num_children?: number; 
   booking_amount?: number; 
+  booking_color?: string; // Color of the booking in calendar
 }
 export interface periods {
   date: string;
@@ -25,6 +29,48 @@ export interface periods {
   color: string;
 }
 
-
+//used in calendarScreen
 export type TBookingUpdated = TBooking & { difference_in_days?: number; reservation_dates: string[];reservation_period?:periods[] };
   
+export type TCalendarBooking={
+  id: string;
+  periods: {
+      color: string;
+      date: string;
+      endingDay: boolean;
+      startingDay: boolean;
+  }[];
+}[]
+
+//used in BookingDetailsScreen
+export type TBookingDetails = TBooking & {
+  guest_id: {
+    last_name: string;
+    first_name: string;
+  };
+  payment_status: {
+    id?: number;
+    payment_status_name: string;
+  };
+  booking_room: {
+    room_id: {
+      status_id: {
+        status_name: string;
+      };
+    };
+  };
+};
+
+export interface TRoom {
+  id: string;
+  floor_id: {
+    floor_number: string;
+  };
+  room_class_id: {
+    class_name: string;
+  };
+  status_id: {
+    status_name: string;
+  };
+  room_number: string;
+}

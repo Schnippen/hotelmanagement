@@ -21,7 +21,7 @@ export const changeDateFormat=(date:string)=>{
 
 
       export const calculateReservationDays = (BookingData: TBooking[]) => {
-        return BookingData.map(({ checkin_date, checkout_date, id }) => {
+        return BookingData.map(({ checkin_date, checkout_date, id,booking_color }) => {
           const checkinDate = new Date(checkin_date);
           const checkoutDate = new Date(checkout_date);
       
@@ -42,23 +42,118 @@ export const changeDateFormat=(date:string)=>{
             checkin_date,
             checkout_date,
             difference_in_days: differenceInDays,
-            reservation_dates: reservationDates
+            reservation_dates: reservationDates,
+            booking_color,
           };
         });
       };
-      
-      export const createReservationPeriod = (state: TBookingUpdated[]) => {
-        let color = 'red';
-        return state.map(({ id, reservation_dates }) => {
-          const periods = reservation_dates.map((date, index) => ({
-            date,
-            startingDay: index === 0,
-            endingDay: index === reservation_dates.length - 1,
-            color: color
-          }));
-          console.log("createReservationPeriod:",{ id, periods })
-          return { id, periods };
-        });
-      };
 
+//TODO
+ //create object for bookings than can be later interpreted and rendered in Caendnar component
+        //add color argumenr, export that to function in futures
+        export const createReservationPeriod = (state: TBookingUpdated[]) => {
+            //let color = 'red';
+            const updatedReservationPeriods= state.map(({ id, reservation_dates,booking_color }) => {
+            const periods = reservation_dates.map((date, index) => ({
+                date,
+                startingDay: index === 0,
+                endingDay: index === reservation_dates.length - 1,
+                color: booking_color?booking_color:randomHexColor
+            }));
+            console.log("createReservationPeriod:",{ id, periods })
+            return { id, periods };
+            });
+            return updatedReservationPeriods
+            //return setReservationPeriodsStates(updatedReservationPeriods);
+        };
+
+
+        //TODO typescript the periods
+        //populates the calendar with objects created by function above to be rendered in Calendar Component
+    export const populateCalendar = (reservationPeriods: any) => {
+        console.log("populateCalendar() runs");
     
+        const markedDates: Record<string, { periods: any[] }> = {}; // Initialize markedDates object
+        // Iterate over each reservation period
+        reservationPeriods.forEach(({ id, periods }:{id:string,periods:any}) => {
+          // Iterate over each period in the reservation
+          periods.forEach(({ date, startingDay, endingDay, color }:{date:string, startingDay:string, endingDay:string, color:string }) => {
+            // Create or update the markedDates object with the current period
+            markedDates[date] = {
+              periods: [
+                ...(markedDates[date]?.periods || []), // Keep existing periods for the date
+                { startingDay, endingDay, color } // Add the new period
+              ]
+            };
+          });
+        });
+        //console.log("populateCalendar():",markedDates)
+        return markedDates
+    };
+
+          //this \/ is for creating transparent current date 
+          export const calculateCurrentDate=()=>{
+            // Create a new Date object
+            const currentDate = new Date();
+            // Get the year, month, and day from the Date object
+            const year = currentDate.getFullYear();
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Months are zero-based, so we add 1
+            const day = String(currentDate.getDate()).padStart(2, '0');
+            // Format the date as "YYYY-MM-DD"
+            const formattedDate = `${year}-${month}-${day}`;
+            //console.log(formattedDate); 
+            return formattedDate
+        }
+
+        const randomHexColor=getRandomHexColor()
+        function getRandomHexColor() {
+            // Generate random RGB values
+            const r = Math.floor(Math.random() * 256); // Red component
+            const g = Math.floor(Math.random() * 256); // Green component
+            const b = Math.floor(Math.random() * 256); // Blue component
+            
+            // Convert RGB to hexadecimal format
+            const hexColor = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+            
+            return hexColor;
+        }
+
+        export const subtractDates=(currentDateString:string,endDateString:string)=>{
+          // Assuming startDateString and endDateString are in the format "YYYY-MM-DD"
+      // Parse the date strings into Date objects
+      const startDate = new Date(currentDateString);
+      const endDate = new Date(endDateString);
+      // Convert the dates to milliseconds
+      const startDateMilliseconds = startDate.getTime();
+      const endDateMilliseconds = endDate.getTime();
+      // Calculate the difference in milliseconds
+      const differenceMilliseconds = endDateMilliseconds - startDateMilliseconds;
+      // Convert milliseconds to days
+      const differenceDays = differenceMilliseconds / (1000 * 60 * 60 * 24);
+      //console.log(differenceDays); // Output the difference in days
+      
+      //TODO language change in future
+      const result=differenceDays===1?"Tommorrow": differenceDays > 1
+      ? differenceDays + " days in the future"
+      : differenceDays === 0
+        ? "Today"
+        : -differenceDays + " days ago";
+      return result
+        }
+
+        export const subtractDatesForBookingCalendar=(currentDateString:string,endDateString:string)=>{
+          // Assuming startDateString and endDateString are in the format "YYYY-MM-DD"
+      // Parse the date strings into Date objects
+      const startDate = new Date(currentDateString);
+      const endDate = new Date(endDateString);
+      // Convert the dates to milliseconds
+      const startDateMilliseconds = startDate.getTime();
+      const endDateMilliseconds = endDate.getTime();
+      // Calculate the difference in milliseconds
+      const differenceMilliseconds = endDateMilliseconds - startDateMilliseconds;
+      // Convert milliseconds to days
+      const differenceDays = differenceMilliseconds / (1000 * 60 * 60 * 24);
+      //console.log(differenceDays); // Output the difference in days
+      const result=differenceDays
+      return result
+        }

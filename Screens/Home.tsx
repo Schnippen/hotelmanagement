@@ -1,9 +1,10 @@
 import React, { PropsWithChildren } from 'react'
-import { Button, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View, useColorScheme } from 'react-native'
+import { Platform, SafeAreaView, ScrollView, StatusBar, StyleSheet, Text, View, useColorScheme } from 'react-native'
 import { Colors, Header, ReloadInstructions, DebugInstructions, LearnMoreLinks } from 'react-native/Libraries/NewAppScreen';
 import { supabase } from '../Supabase/supabase';
 //import { supabase } from '../Supabase/supabase';
-
+import { Button } from '@rneui/base';
+import { Icon } from '@rneui/themed';
 
 function HomeScreen({navigation}:any) {
 
@@ -39,7 +40,7 @@ type SectionProps = PropsWithChildren<{
 const isDarkMode = useColorScheme() === 'dark';
 
 
-const  fetchData=async()=>{   
+/* const  fetchData=async()=>{   
     let { data: booking, error } = await supabase
           .from('booking')
           .select('checkin_date,checkout_date')
@@ -49,11 +50,14 @@ const  fetchData=async()=>{
             console.error('Error fetching data:', error);
             return;
           }
-}
-
+} */
+//name={`${OS ? "ios" : "md"}-stepforward`}
+let OS = Platform.OS ==="ios"
 const backgroundStyle = {
   backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
 };
+const myIcon = <Icon name="rocket" size={30} color="#900" />;
+
   return (
     
       <SafeAreaView style={backgroundStyle}>
@@ -69,8 +73,18 @@ const backgroundStyle = {
             style={{
               backgroundColor: isDarkMode ? Colors.black : Colors.white,
             }}>
-                <Button title='Go to calendar' onPress={()=>navigation.navigate("CalendarScreen")}/>
-                <Button title='Fetch Data' onPress={()=>fetchData()}/>
+                <Button title='Go to calendar' onPress={()=>navigation.navigate("CalendarScreen")} style={styles.buttonStyle}/>
+                <Button title='Go to add booking' onPress={()=>navigation.navigate("AddBooking")} style={styles.buttonStyle}/>
+                <Button title='Go to BookingDetails' onPress={()=>navigation.navigate("BookingDetails")} style={styles.buttonStyle}/>
+                <Button onPress={()=>navigation.navigate("Settings")} radius={"md"} size="sm" type="outline" style={{marginVertical:8,justifyContent:'center'}}>
+                Go to Settings screen
+                <Icon
+                name={`settings`}
+                size={20}
+                color="black"
+                />
+                </Button>
+                {myIcon}
             <Section title="Step One">
               Edit <Text style={styles.highlight}>App.tsx</Text> to change this
               screen and then come back to see your edits.
@@ -78,12 +92,7 @@ const backgroundStyle = {
             <Section title="See Your Changes">
               <ReloadInstructions />
             </Section>
-            <Section title="Debug">
-              <DebugInstructions />
-            </Section>
-            <Section title="Learn More">
-              Read the docs to discover what to do next:
-            </Section>
+            
             <LearnMoreLinks />
           </View>
         </ScrollView>
@@ -109,6 +118,9 @@ const styles = StyleSheet.create({
     highlight: {
       fontWeight: '700',
     },
+    buttonStyle:{
+      marginVertical:8,
+    }
   });
   
 
