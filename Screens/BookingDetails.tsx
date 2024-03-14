@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../Store/store';
 import { changeDateFormat } from '../Utils/functions';
 import BookingDetailsListItem from '../Components/BookingDetailsListItem';
+//TODO create types for navigation
 function BookingDetails({navigation,route}:any) {
 
   

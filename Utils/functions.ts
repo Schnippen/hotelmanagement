@@ -132,11 +132,28 @@ export const changeDateFormat=(date:string)=>{
       const differenceDays = differenceMilliseconds / (1000 * 60 * 60 * 24);
       //console.log(differenceDays); // Output the difference in days
       
-      const today = "Today" //TODO language change in future
+      //TODO language change in future
       const result=differenceDays===1?"Tommorrow": differenceDays > 1
       ? differenceDays + " days in the future"
       : differenceDays === 0
         ? "Today"
         : -differenceDays + " days ago";
+      return result
+        }
+
+        export const subtractDatesForBookingCalendar=(currentDateString:string,endDateString:string)=>{
+          // Assuming startDateString and endDateString are in the format "YYYY-MM-DD"
+      // Parse the date strings into Date objects
+      const startDate = new Date(currentDateString);
+      const endDate = new Date(endDateString);
+      // Convert the dates to milliseconds
+      const startDateMilliseconds = startDate.getTime();
+      const endDateMilliseconds = endDate.getTime();
+      // Calculate the difference in milliseconds
+      const differenceMilliseconds = endDateMilliseconds - startDateMilliseconds;
+      // Convert milliseconds to days
+      const differenceDays = differenceMilliseconds / (1000 * 60 * 60 * 24);
+      //console.log(differenceDays); // Output the difference in days
+      const result=differenceDays
       return result
         }

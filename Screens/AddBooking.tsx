@@ -8,9 +8,10 @@ import { supabase } from '../Supabase/supabase';
 import { TRoom } from '../Types/types';
 import RoomComponent from '../Components/RoomComponent';
 import { ButtonGroup } from '@rneui/themed';
+import SkeletonRoomComponent from '../Components/Skeletons/SkeletonRoomComponent';
 
 //TODO use react elements, try to use some kind of form library
-function AddBooking() {
+function AddBooking({navigation}:any) {
 
   let mockupRoomsData:TRoom[]=[
     {
@@ -95,6 +96,7 @@ const FilteringButtonGroup=()=>{
         />
   )
 }
+
 //TODO add skeleton
   return (
     <View style={styles.container}>
@@ -106,12 +108,13 @@ const FilteringButtonGroup=()=>{
         <Button title="fetch" type="outline" onPress={()=>{fetchData()}} />
         <FlatList  
             ListHeaderComponent={<FilteringButtonGroup/>}
+            ListEmptyComponent={<SkeletonRoomComponent/>}
             style={{backgroundColor:"red",height:"100%"}}
             data={selectedIndex===0?state:
               selectedIndex===1?filteredByAvailability:
               selectedIndex===2?filteredByOccupancy:null}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <RoomComponent item={item}/>}
+            renderItem={({ item }) => <RoomComponent item={item} navigation={navigation}/>}
             contentContainerStyle={{ paddingBottom: 50 }}
           />
       {/* <List state={MockupbookingDetails}/> */}

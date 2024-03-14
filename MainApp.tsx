@@ -9,6 +9,7 @@ import Settings from './Screens/Settings';
 import { useDispatch, useSelector } from 'react-redux';
 import { SET_CURRENT_ISO_DATE, SET_CURRENT_ISO_DATE_SHORT } from './Store/Reducers/createCurrentISODate';
 import { RootState } from './Store/store';
+import AddBookingCalendar from './Screens/AddBookingCalendar';
 
 
 function MainApp() {
@@ -34,6 +35,7 @@ const initialStateForBookingDetailsScreen = useSelector((state:RootState) => sta
       <Stack.Screen name="BookingDetails" component={BookingDetails} 
         initialParams={ {selectedDay: initialStateForBookingDetailsScreen }}/>
       <Stack.Screen name="Settings" component={Settings} />
+      <Stack.Screen name="AddBookingCalendar" component={AddBookingCalendar} />
     </Stack.Navigator>
   </NavigationContainer>
   )
