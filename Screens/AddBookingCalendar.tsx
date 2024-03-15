@@ -4,28 +4,33 @@ import RoomComponent from '../Components/RoomComponent'
 import { Calendar } from 'react-native-calendars'
 import { changeDateFormat, subtractDates, subtractDatesForBookingCalendar } from '../Utils/functions'
 import { roomInitialParams } from '../Utils/initialParamsNavigation'
+import { Divider, Text } from '@rneui/themed'
+import { TselectedDatesOnCalendar } from '../Types/types'
 //TODO add types to navigation,states and maybe route
+//TODO add globa color in future????
 function AddBookingCalendar({navigation,route}:{navigation:any,route?:any}) {
   const roomDetails = route?.params?.roomDetails || roomInitialParams;
   //console.log(JSON.stringify(roomDetails, null, 2))
 
-  const [selectedDatesOnCalendar,setSelectedDatesOnCalendar]=useState<any>({startingDate:null,endingDate:null})
+  const [selectedDatesOnCalendar, setSelectedDatesOnCalendar] = useState<TselectedDatesOnCalendar>({ startingDate: null, endingDate: null });
+
   const [markedDates,setMarkedDates]=useState<any>({})
 //add marked 
-
-
   const handleDateSelection = (dayOnTheCalendar:string) => {
     const startDate = selectedDatesOnCalendar.startingDate
     const endingDate =selectedDatesOnCalendar.endingDate
     if (startDate === null) {
       setSelectedDatesOnCalendar({ ...selectedDatesOnCalendar, startingDate: dayOnTheCalendar });
       //one side marked
+      handleFirstMarkedDate(dayOnTheCalendar)
     } else if (startDate !== null && endingDate === null) {
         setSelectedDatesOnCalendar({ ...selectedDatesOnCalendar, endingDate:  dayOnTheCalendar });
         //both sides marked
         handleMarkedDates(startDate,dayOnTheCalendar)
     }else if(startDate&&endingDate){
      setSelectedDatesOnCalendar({ ...selectedDatesOnCalendar, startingDate: dayOnTheCalendar,endingDate:null });
+     //one side marked
+     handleFirstMarkedDate(dayOnTheCalendar)
      console.info("Reseting endingDate handleDateSelection()")
     }
           //one side marked
@@ -68,11 +73,26 @@ function AddBookingCalendar({navigation,route}:{navigation:any,route?:any}) {
     setMarkedDates(markedDates)
 };
 
+const handleFirstMarkedDate=(startDate:string)=>{
+  const firstDateToBeMarked= {[startDate]:{startingDay:true,selected:true,color:"green",endingDay:true}}
+  console.log("firstDateToBeMarked",firstDateToBeMarked)
+  setMarkedDates(firstDateToBeMarked)
+  
+}
+
   console.log(selectedDatesOnCalendar)
 
- const example={"2024-03-13": {"color": "green", "endingDay": false, "selected": true, "startingDay": true}, "2024-03-14": {"color": "green", "endingDay": false, "selected": true, "startingDay": false}, "2024-03-15": {"color": "green", "endingDay": true, "selected": true, "startingDay": false}}
+  const firstReservationDate=selectedDatesOnCalendar.startingDate
+  const lastReservationDate=selectedDatesOnCalendar.endingDate
+
   return (
     <View style={{flex:1}}>
+      <View style={{height:100,backgroundColor:"red",justifyContent:"center"}}>
+        <Text h4>Check-in date: {firstReservationDate}</Text>
+        <Text h4>Check-out date: {lastReservationDate}</Text>
+      </View>
+      <Divider inset={true} insetType="middle" />
+
       {/* <RoomComponent item={roomDetails}/> */}
       <Calendar
             // Collection of dates that have to be marked. Default = {}

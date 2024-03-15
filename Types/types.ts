@@ -74,3 +74,4 @@ export interface TRoom {
   };
   room_number: string;
 }
+export type TselectedDatesOnCalendar={ startingDate: string | null; endingDate: string | null }
