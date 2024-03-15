@@ -125,7 +125,7 @@ const navigateToDayDetails=(day:string)=>{
   }
   //navigation.navigate("BookingDetails")
 }
-
+//TODO  https://github.com/wix/react-native-calendars/issues/2430 rerender fix
   return (
     <View style={styles.container}> 
         <View style={styles.topcontainer}>

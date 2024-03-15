@@ -15,7 +15,7 @@ const RoomComponent=({ item, navigation }: { item: TRoom, navigation?: any })=>{
     const buttonDisabled=room_statusLowerCase==="occupied"||room_statusLowerCase==="under maintenance"
     const URL = 'https://awildgeographer.files.wordpress.com/2015/02/john_muir_glacier.jpg'
     
-
+    //TODO add item type
     const navigateToAddBookingCalendar=(item:any)=>{
         return navigation.navigate("AddBookingCalendar",{roomDetails:item})
     }

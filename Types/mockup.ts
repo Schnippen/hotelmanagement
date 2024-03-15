@@ -69,7 +69,9 @@ const populatingCalendarMOCKUP={
     let mockupRoomsData:TRoom[]=[
       {
         "id": "4fac5959-62c8-41a8-855a-e149e4fc6c76",
-        "floor_id": 4,
+        "floor_id": {
+          "floor_number":"3"
+        },
         "room_class_id": {
           "class_name": "Deluxe"
         },
@@ -80,7 +82,9 @@ const populatingCalendarMOCKUP={
       },
       {
         "id": "0fad24a2-035e-4d12-9964-9ba84b4373c2",
-        "floor_id": 5,
+        "floor_id": {
+          "floor_number": "5"
+        },
         "room_class_id": {
           "class_name": "Standard"
         },
@@ -91,7 +95,9 @@ const populatingCalendarMOCKUP={
       },
       {
         "id": "b79b8ae7-e19a-4485-8f03-4215b943aca6",
-        "floor_id": 6,
+        "floor_id": {
+          "floor_number": "1"
+        },
         "room_class_id": {
           "class_name": "Suite"
         },

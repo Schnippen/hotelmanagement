@@ -141,10 +141,10 @@ export const changeDateFormat=(date:string)=>{
       return result
         }
 
-        export const subtractDatesForBookingCalendar=(currentDateString:string,endDateString:string)=>{
+        export const subtractDatesForBookingCalendar=(startingDate:string,endDateString:string)=>{
           // Assuming startDateString and endDateString are in the format "YYYY-MM-DD"
       // Parse the date strings into Date objects
-      const startDate = new Date(currentDateString);
+      const startDate = new Date(startingDate);
       const endDate = new Date(endDateString);
       // Convert the dates to milliseconds
       const startDateMilliseconds = startDate.getTime();
@@ -154,6 +154,6 @@ export const changeDateFormat=(date:string)=>{
       // Convert milliseconds to days
       const differenceDays = differenceMilliseconds / (1000 * 60 * 60 * 24);
       //console.log(differenceDays); // Output the difference in days
-      const result=differenceDays
-      return result
+      console.log("subtractDatesForBookingCalendar():",differenceDays)
+      return differenceDays ;
         }
