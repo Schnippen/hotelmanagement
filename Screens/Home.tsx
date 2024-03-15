@@ -84,6 +84,7 @@ const myIcon = <Icon name="rocket" size={30} color="#900" />;
                 color="black"
                 />
                 </Button>
+                <Button title='AddBookingCalendar' onPress={()=>navigation.navigate("AddBookingCalendar")} style={styles.buttonStyle}/>
                 {myIcon}
             <Section title="Step One">
               Edit <Text style={styles.highlight}>App.tsx</Text> to change this
