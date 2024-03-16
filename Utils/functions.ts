@@ -157,3 +157,28 @@ export const changeDateFormat=(date:string)=>{
       console.log("subtractDatesForBookingCalendar():",differenceDays)
       return differenceDays ;
         }
+
+        export const getDayInfo = (dateString: string) => {
+          const daysOfWeek = ['Sun', 'Mon', 'Tues', 'Wed', 'Thu', 'Fri', 'Satur'];
+          const monthsOfYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+          
+          const date = new Date(dateString);
+          const dayIndex = date.getDay();
+          const monthIndex = date.getMonth();
+          const dayNumber = date.getDate();
+          const year = date.getFullYear();
+
+      
+          const dayName = daysOfWeek[dayIndex];
+          const monthName = monthsOfYear[monthIndex];
+          
+          const result = {
+            dayName,
+            monthName,
+            dayNumber,
+            year
+        };
+  
+          return result
+      };
+      

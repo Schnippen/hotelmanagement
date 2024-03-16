@@ -2,10 +2,11 @@ import React, { useState } from 'react'
 import { View } from 'react-native'
 import RoomComponent from '../Components/RoomComponent'
 import { Calendar } from 'react-native-calendars'
-import { changeDateFormat, subtractDates, subtractDatesForBookingCalendar } from '../Utils/functions'
+import { changeDateFormat, getDayInfo,subtractDatesForBookingCalendar } from '../Utils/functions'
 import { roomInitialParams } from '../Utils/initialParamsNavigation'
-import { Divider, Text } from '@rneui/themed'
+import { Button, Divider, Text } from '@rneui/themed'
 import { TselectedDatesOnCalendar } from '../Types/types'
+import { supabase } from '../Supabase/supabase'
 //TODO add types to navigation,states and maybe route
 //TODO add globa color in future????
 function AddBookingCalendar({navigation,route}:{navigation:any,route?:any}) {
@@ -13,9 +14,15 @@ function AddBookingCalendar({navigation,route}:{navigation:any,route?:any}) {
   //console.log(JSON.stringify(roomDetails, null, 2))
 
   const [selectedDatesOnCalendar, setSelectedDatesOnCalendar] = useState<TselectedDatesOnCalendar>({ startingDate: null, endingDate: null });
-
-  const [markedDates,setMarkedDates]=useState<any>({})
+  const [markedDates,setMarkedDates]=useState<any>({}) //TODO TYPES
+  const [fetchedData,setFetchedData]=useState<any>(null) //numbers of available bookings
 //add marked 
+const handleFirstMarkedDate=(startDate:string)=>{
+  const firstDateToBeMarked= {[startDate]:{startingDay:true,selected:true,color:"#2596be",endingDay:true}}
+  //console.log("firstDateToBeMarked",firstDateToBeMarked)
+  setMarkedDates(firstDateToBeMarked)
+}
+
   const handleDateSelection = (dayOnTheCalendar:string) => {
     const startDate = selectedDatesOnCalendar.startingDate
     const endingDate =selectedDatesOnCalendar.endingDate
@@ -60,11 +67,12 @@ function AddBookingCalendar({navigation,route}:{navigation:any,route?:any}) {
 /*         console.log("index",index,howManyDays,"currentDate:",currentDate,"dateTodate:",dateToAdd,"subtractedDates():",subtractedDates,increment) */
         const isStartingDay = increment === 1 ? index === 0 : isLastDay;
         const isEndingDay = increment === -1 ? index === 0 : isLastDay;
+        const colorGrading =index===0||isLastDay?"#2596be":"#3ba1c5"
         return {
             [dateToAdd.toISOString().split('T')[0]]: {
                 startingDay: isStartingDay,//index === 0,
                 selected: true,
-                color: 'green',
+                color: colorGrading,
                 endingDay: isEndingDay
             }
         };
@@ -72,49 +80,75 @@ function AddBookingCalendar({navigation,route}:{navigation:any,route?:any}) {
     //console.log(markedDates)
     setMarkedDates(markedDates)
 };
-
-const handleFirstMarkedDate=(startDate:string)=>{
-  const firstDateToBeMarked= {[startDate]:{startingDay:true,selected:true,color:"green",endingDay:true}}
-  console.log("firstDateToBeMarked",firstDateToBeMarked)
-  setMarkedDates(firstDateToBeMarked)
-  
-}
+const fetchData= async ()=>{
+  try {
+    const formattedFirstDate = `${selectedDatesOnCalendar.startingDate}T00:00:00Z`
+    const formattedLastDate = `${selectedDatesOnCalendar.endingDate}T00:00:00Z`
+    console.log("trying to fetch")//BUG
+    let { data: booking, error,count } = await supabase
+    .from('booking')
+    .select('*', { count: 'exact', head: true })//, { count: 'exact', head: true }
+    .filter('checkin_date', 'lte', formattedFirstDate)
+    .filter('checkout_date', 'gte', formattedLastDate);
+    //'booking_room(room_id(status_id(status_name)))'
+    console.log("booking",booking,count,formattedFirstDate,formattedLastDate)
+    console.info("stringify:",JSON.stringify(booking, null, 2))
+    
+    setFetchedData(count)
+    if (error) {
+      console.error('Error fetching data:', error);
+    }
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    return error
+  }
+} 
 
   console.log(selectedDatesOnCalendar)
-
+  
   const firstReservationDate=selectedDatesOnCalendar.startingDate
   const lastReservationDate=selectedDatesOnCalendar.endingDate
+  const firstDayName=firstReservationDate?getDayInfo(firstReservationDate):null
+  const lastDayName=lastReservationDate? getDayInfo(lastReservationDate):null
+  
+  const AvailableRooms=()=>{
+    const shit = fetchedData>0?"Available Rooms:":"Choose Dates"
+    return(
+      <Text>{shit}{fetchedData}</Text>
+    )
+  }
 
   return (
     <View style={{flex:1}}>
-      <View style={{height:100,backgroundColor:"red",justifyContent:"center"}}>
-        <Text h4>Check-in date: {firstReservationDate}</Text>
-        <Text h4>Check-out date: {lastReservationDate}</Text>
+      <View style={{height:120,backgroundColor:"red",justifyContent:"center",alignItems:'center'}}>
+        <View style={{alignItems:'center',marginVertical:8}}>
+        <Text>Check-in date: </Text>
+        <Text h4>{firstDayName?.dayName} {firstDayName?.dayNumber} {firstDayName?.monthName} {firstDayName?.year}</Text>
+        </View>
+        <View style={{alignItems:'center',marginVertical:8}}>
+        <Text>Check-out date:</Text>
+        <Text h4> {lastDayName?.dayName} {lastDayName?.dayNumber} {lastDayName?.monthName} {lastDayName?.year}</Text>
+        </View>
       </View>
-      <Divider inset={true} insetType="middle" />
+      <Divider inset={true} insetType="middle" color="#2596be" />
 
       {/* <RoomComponent item={roomDetails}/> */}
       <Calendar
             // Collection of dates that have to be marked. Default = {}
             markingType={'period'}
-
             markedDates={{...markedDates}}
-/*             markedDates={{
-      '2024-03-19': {startingDay: true, selected: true,color: 'green'},
-      '2024-03-20': {startingDay: false,selected: true, color: 'green'},
-      '2024-03-21': {selected: true, endingDay: true, color: 'green'}}} */
             onDayPress={(day)=>{
               console.log("onDayPress()",day.dateString), 
               handleDateSelection(day.dateString)}}
             onDayLongPress={day => {
-              //checkDayReservation(day.dateString,globalCalendarData)
-              console.log('onDayLongPress()', day.dateString);
-              handleMarkedDates('2024-03-12','2024-03-15')
-
-            }}
+              null
+            }} 
           />
+            <Button title="fetch data" type="outline" onPress={()=>{console.log("press"),fetchData()}}/>
+            <AvailableRooms/>
     </View>
   )
 }
 
 export default AddBookingCalendar
+

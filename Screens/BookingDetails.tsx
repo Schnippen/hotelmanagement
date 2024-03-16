@@ -20,6 +20,7 @@ console.log("params",selectedDay)
 
 const formattedSelectedDay = `${selectedDay}T00:00:00Z`
 //TODO fetch data on first screen render with react querry
+//TODO good example of how to fetch availble room or booking by date 
 const fetchData= async ()=>{
   try {
     console.log("trying to fetch")
