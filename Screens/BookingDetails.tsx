@@ -15,20 +15,24 @@ function BookingDetails({navigation,route}:any) {
 const [state,setState]=useState<TBookingDetails[]|null>(null)
 
 const {selectedDay}= route.params //selectedDay from previous screen  
-console.log("params",selectedDay)
+//console.log("params",selectedDay)
 //2024-03-05
 
 const formattedSelectedDay = `${selectedDay}T00:00:00Z`
 //TODO fetch data on first screen render with react querry
 //TODO good example of how to fetch availble room or booking by date 
+
 const fetchData= async ()=>{
   try {
     console.log("trying to fetch")
     let { data: booking, error } = await supabase
     .from('booking')
     .select('*,payment_status(payment_status_name), booking_room(room_id(status_id(status_name))),guest_id(first_name,last_name)')
-    .filter('checkin_date', 'lte', formattedSelectedDay)
-    .filter('checkout_date', 'gte', formattedSelectedDay)
+/*     .filter('checkin_date', 'lte', formattedSelectedDay)
+    .filter('checkout_date', 'gte', formattedSelectedDay) */
+    .lte('checkin_date',  formattedSelectedDay)
+    .gte('checkout_date',formattedSelectedDay)
+    //.filter('checkout_date', 'gte', second)
 
     console.log("booking",booking)
     console.info("stringify:",JSON.stringify(booking, null, 2))

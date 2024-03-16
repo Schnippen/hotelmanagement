@@ -89,16 +89,16 @@ const fetchData= async ()=>{
     const isPositiveSubtracredDates = subtractedDates> 0
     const formattedFirstDate = `${selectedDatesOnCalendar.startingDate}T00:00:00Z`
     const formattedLastDate = `${selectedDatesOnCalendar.endingDate}T00:00:00Z`
-    const firstParam = isPositiveSubtracredDates?formattedFirstDate:formattedLastDate
-    const secondParam = isPositiveSubtracredDates?formattedLastDate:formattedFirstDate
+    const earlier_date = isPositiveSubtracredDates?formattedFirstDate:formattedLastDate
+    const later_date = isPositiveSubtracredDates?formattedLastDate:formattedFirstDate
     //console.log("trying to fetch",subtractedDates,"positive:?",isPositiveSubtracredDates,firstParam,secondParam)
     let { data: booking, error,count } = await supabase
     .from('booking')
     .select('*', { count: 'exact', head: false })//, { count: 'exact', head: true }
-    .filter('checkin_date', 'lte', firstParam)// be sure thr hours in supabase are T00:00:00Z
-    .filter('checkout_date', 'gte', secondParam);
+    .filter('checkin_date', 'lte', later_date)// be sure thr hours in supabase are T00:00:00Z //later_date
+    .filter('checkout_date', 'gte', earlier_date); //earlier_date
     //'booking_room(room_id(status_id(status_name)))'
-    console.log("booking",booking,count,firstParam,secondParam,isPositiveSubtracredDates)
+    console.log("booking",booking,count,earlier_date,later_date,isPositiveSubtracredDates)
     console.info("stringify:",JSON.stringify(booking, null, 2),"length:",count)
     
     setFetchedData(count)
@@ -118,7 +118,7 @@ useEffect(()=>{
  //console.log("useEffect()")
 },[selectedDatesOnCalendar.startingDate,selectedDatesOnCalendar.endingDate])
   console.log(selectedDatesOnCalendar)
-  
+  //TODO maybe add default current ISO date from global state, to prevennt bugs?
   const firstReservationDate=selectedDatesOnCalendar.startingDate
   const lastReservationDate=selectedDatesOnCalendar.endingDate
   const firstDayName=firstReservationDate?getDayInfo(firstReservationDate):null
@@ -136,7 +136,13 @@ useEffect(()=>{
       </View>
     )
   }
-
+  const GoToRoomScreen=()=>{
+    return(
+      <View style={{marginVertical:8}}>
+              <Button title="See available rooms" disabled={fetchedData<0} type="outline" onPress={()=>{console.log("press")}}/>
+      </View>
+    )
+  }
   return (
     <View style={{flex:1}}>
       <View style={{height:120,backgroundColor:"red",justifyContent:"center",alignItems:'center'}}>
@@ -165,6 +171,7 @@ useEffect(()=>{
           />
             <Button title="fetch data" type="outline" onPress={()=>{console.log("press"),fetchData()}}/>
             <AvailableRooms/>
+            <GoToRoomScreen/>
     </View>
   )
 }
