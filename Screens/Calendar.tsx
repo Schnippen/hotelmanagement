@@ -68,22 +68,7 @@ const templatePeriod = {
     ]
   }
 };//{color: 'transparent'},
-/* //add color argumenr, export that to function in futures
-const createReservationPeriod = (state: TBookingUpdated[]) => {
-  let color = 'red';
-  const updatedReservationPeriods= state.map(({ id, reservation_dates }) => {
-    const periods = reservation_dates.map((date, index) => ({
-      date,
-      startingDay: index === 0,
-      endingDay: index === reservation_dates.length - 1,
-      color: colorr
-    }));
-    console.log("createReservationPeriod:",{ id, periods })
-    return { id, periods };
-  });
-  return updatedReservationPeriods
-  //return setReservationPeriodsStates(updatedReservationPeriods);
-}; */
+
 
 const markedDates= datesReady?datesReady:templatePeriod
 
