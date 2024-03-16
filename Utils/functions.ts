@@ -154,7 +154,7 @@ export const changeDateFormat=(date:string)=>{
       // Convert milliseconds to days
       const differenceDays = differenceMilliseconds / (1000 * 60 * 60 * 24);
       //console.log(differenceDays); // Output the difference in days
-      console.log("subtractDatesForBookingCalendar():",differenceDays)
+      //console.log("subtractDatesForBookingCalendar():",differenceDays)
       return differenceDays ;
         }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { View } from 'react-native'
 import RoomComponent from '../Components/RoomComponent'
 import { Calendar } from 'react-native-calendars'
@@ -56,7 +56,7 @@ const handleFirstMarkedDate=(startDate:string)=>{
     }
     const positiveSubtracredDates = subtractedDates < 0?Math.abs(subtractedDates-1):subtractedDates+1 
     const howManyDays =positiveSubtracredDates//subtractedDates+1 //subtracted + starting Day
-    //console.log("howwManyDays",howManyDays)
+    //console.log("howManyDays",howManyDays)
     let currentDate = new Date(startDate);
     const markedDates = Array.from({ length: howManyDays }, (_, index) => {
         const dateToAdd = new Date(currentDate);
@@ -82,28 +82,41 @@ const handleFirstMarkedDate=(startDate:string)=>{
 };
 const fetchData= async ()=>{
   try {
+    
+    const firstDate=selectedDatesOnCalendar.startingDate?selectedDatesOnCalendar.startingDate:""
+    const secondDate=selectedDatesOnCalendar.endingDate?selectedDatesOnCalendar.endingDate:""
+    const subtractedDates = subtractDatesForBookingCalendar(firstDate, secondDate);
+    const isPositiveSubtracredDates = subtractedDates> 0
     const formattedFirstDate = `${selectedDatesOnCalendar.startingDate}T00:00:00Z`
     const formattedLastDate = `${selectedDatesOnCalendar.endingDate}T00:00:00Z`
-    console.log("trying to fetch")//BUG
+    const firstParam = isPositiveSubtracredDates?formattedFirstDate:formattedLastDate
+    const secondParam = isPositiveSubtracredDates?formattedLastDate:formattedFirstDate
+    //console.log("trying to fetch",subtractedDates,"positive:?",isPositiveSubtracredDates,firstParam,secondParam)
     let { data: booking, error,count } = await supabase
     .from('booking')
-    .select('*', { count: 'exact', head: true })//, { count: 'exact', head: true }
-    .filter('checkin_date', 'lte', formattedFirstDate)
-    .filter('checkout_date', 'gte', formattedLastDate);
+    .select('*', { count: 'exact', head: false })//, { count: 'exact', head: true }
+    .filter('checkin_date', 'lte', firstParam)// be sure thr hours in supabase are T00:00:00Z
+    .filter('checkout_date', 'gte', secondParam);
     //'booking_room(room_id(status_id(status_name)))'
-    console.log("booking",booking,count,formattedFirstDate,formattedLastDate)
-    console.info("stringify:",JSON.stringify(booking, null, 2))
+    console.log("booking",booking,count,firstParam,secondParam,isPositiveSubtracredDates)
+    console.info("stringify:",JSON.stringify(booking, null, 2),"length:",count)
     
     setFetchedData(count)
     if (error) {
       console.error('Error fetching data:', error);
-    }
+    } 
   } catch (error) {
     console.error('Error fetching data:', error);
     return error
   }
 } 
-
+useEffect(()=>{
+  if(selectedDatesOnCalendar.startingDate&&selectedDatesOnCalendar.endingDate){
+    console.log("useEffect()")
+    fetchData()
+  }
+ //console.log("useEffect()")
+},[selectedDatesOnCalendar.startingDate,selectedDatesOnCalendar.endingDate])
   console.log(selectedDatesOnCalendar)
   
   const firstReservationDate=selectedDatesOnCalendar.startingDate
@@ -112,9 +125,15 @@ const fetchData= async ()=>{
   const lastDayName=lastReservationDate? getDayInfo(lastReservationDate):null
   
   const AvailableRooms=()=>{
-    const shit = fetchedData>0?"Available Rooms:":"Choose Dates"
+    const shit = fetchedData>0?`Available Rooms: ${fetchedData}`:"Choose Dates"
     return(
-      <Text>{shit}{fetchedData}</Text>
+      <View style={{marginVertical:8}}>
+      <Divider inset={true} insetType="middle" color="#2596be" />
+      <View style={{width:"100%",height:50,backgroundColor:'null',alignItems:"center",justifyContent:"center"}}>
+      <Text h4>{shit}</Text>
+      </View>
+      <Divider inset={true} insetType="middle" color="#2596be" />
+      </View>
     )
   }
 
