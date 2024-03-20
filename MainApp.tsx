@@ -2,7 +2,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import React, {useEffect} from 'react';
 import RoomsScreen from './Screens/RoomsScreen';
-import BookingDetails from './Screens/BookingDetails';
+import CurrentBookingsScreen from './Screens/CurrentBookingsScreen';
 import CalendarScreen from './Screens/Calendar';
 import HomeScreen from './Screens/Home';
 import Settings from './Screens/Settings';
@@ -38,8 +38,8 @@ function MainApp() {
         <Stack.Screen name="RoomsScreen" component={RoomsScreen} />
         <Stack.Screen name="RoomDetailsScreen" component={RoomDetailsScreen} />
         <Stack.Screen
-          name="BookingDetails"
-          component={BookingDetails}
+          name="CurrentBookingsScreen"
+          component={CurrentBookingsScreen}
           initialParams={{selectedDay: initialStateForBookingDetailsScreen}}
         />
         <Stack.Screen name="Settings" component={Settings} />

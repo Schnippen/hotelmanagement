@@ -1,21 +1,13 @@
 import React, {PropsWithChildren} from 'react';
 import {
   Platform,
-  SafeAreaView,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   View,
   useColorScheme,
 } from 'react-native';
-import {
-  Colors,
-  Header,
-  ReloadInstructions,
-  DebugInstructions,
-  LearnMoreLinks,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
 import {supabase} from '../Supabase/supabase';
 //import { supabase } from '../Supabase/supabase';
 import {Button} from '@rneui/base';
@@ -63,8 +55,8 @@ function HomeScreen({navigation}: any) {
           style={{marginVertical: 8}}
         />
         <Button
-          title="Go to BookingDetails"
-          onPress={() => navigation.navigate('BookingDetails')}
+          title="Go to CurrentBookingsScreen"
+          onPress={() => navigation.navigate('CurrentBookingsScreen')}
           style={{marginVertical: 8}}
         />
         <Button

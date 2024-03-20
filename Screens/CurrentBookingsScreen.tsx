@@ -7,9 +7,9 @@ import {MOCKUPbookingDetailsFETCHdata} from '../Types/mockup';
 import {useSelector} from 'react-redux';
 import {RootState} from '../Store/store';
 import {changeDateFormat} from '../Utils/functions';
-import BookingDetailsListItem from '../Components/BookingDetailsListItem';
+import CurrentBookingsListItem from '../Components/BookingDetailsListItem';
 //TODO create types for navigation
-function BookingDetails({navigation, route}: any) {
+function CurrentBookingsScreen({navigation, route}: any) {
   const [state, setState] = useState<TBookingDetails[] | null>(null);
 
   const {selectedDay} = route.params; //selectedDay from previous screen
@@ -82,7 +82,7 @@ function BookingDetails({navigation, route}: any) {
   const List = ({state}: {state: TBookingDetails[] | null}) => {
     return state && state.length > 0 ? (
       state.map((item: TBookingDetails, index: number) => (
-        <BookingDetailsListItem item={item} key={item.id} />
+        <CurrentBookingsListItem item={item} key={item.id} />
       ))
     ) : (
       <View>
@@ -121,7 +121,7 @@ function BookingDetails({navigation, route}: any) {
         style={{backgroundColor: 'red', height: '100%'}}
         data={state}
         keyExtractor={item => item.id}
-        renderItem={({item}) => <BookingDetailsListItem item={item} />}
+        renderItem={({item}) => <CurrentBookingsListItem item={item} />}
         contentContainerStyle={{paddingBottom: 50}}
       />
       {/* <List state={MockupbookingDetails}/> */}
@@ -129,7 +129,7 @@ function BookingDetails({navigation, route}: any) {
   );
 }
 
-export default BookingDetails;
+export default CurrentBookingsScreen;
 
 /* SELECT *
 FROM booking

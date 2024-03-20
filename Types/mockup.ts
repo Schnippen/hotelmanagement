@@ -340,7 +340,41 @@ let mockupRoomsData: TRoom[] = [
     room_number: '3',
   },
 ];
-
+let mockupRoomDetailsSceen = [
+  {
+    id: '0fad24a2-035e-4d12-9964-9ba84b4373c2',
+    status_id: {
+      status_name: 'Available',
+    },
+    floor_id: {
+      floor_number: '2nd Floor',
+    },
+    room_class_id: {
+      base_price: 100,
+      class_name: 'Standard',
+      room_class_feature: [
+        {
+          feature_id: {
+            feature_name: 'Grill accessories',
+          },
+        },
+        {
+          feature_id: {
+            feature_name: 'Kettle',
+          },
+        },
+      ],
+      room_class_bed_type: [
+        {
+          num_beds: 2,
+          bed_type_id: {
+            bed_type_name: 'Single',
+          },
+        },
+      ],
+    },
+  },
+];
 //TODO calendar theme
 /*   theme={{
       backgroundColor: '#ffffff',
