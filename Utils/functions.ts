@@ -182,3 +182,31 @@ export const changeDateFormat=(date:string)=>{
           return result
       };
       
+//TODO work on objects, i am sissy xD
+  export const flattenObj = (ob: Record<string, any> | Record<string, any>[]) => {
+        // If ob is an array, take the first element
+        if (Array.isArray(ob)) {
+          ob = ob[0];
+        }
+      
+        let result: { [key: string]: any } = {};
+      
+        // Type guard to check if ob is an object
+        if (typeof ob === 'object' && ob !== null && !Array.isArray(ob)) {
+          for (const key in ob) {
+            if (Object.prototype.hasOwnProperty.call(ob, key)) {
+              const value = ob[key];
+              if (value && typeof value === 'object' && !Array.isArray(value)) {
+                const flattened = flattenObj(value);
+                for (const nestedKey in flattened) {
+                  result[`${key}.${nestedKey}`] = flattened[nestedKey];
+                }
+              } else {
+                result[key] = value;
+              }
+            }
+          }
+        }
+        //console.log("flattenObj()",JSON.stringify(result,null,2))
+        return result;
+      };

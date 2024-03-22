@@ -4,6 +4,7 @@ import {ScrollView, View} from 'react-native';
 import {TRoom, TRoomDetailsComponentFull} from '../Types/types';
 import {supabase} from '../Supabase/supabase';
 import RoomComponentFull from '../Components/RoomComponentFull';
+import { flattenObj } from '../Utils/functions';
 
 interface Props {
   route: {
@@ -24,7 +25,7 @@ const RoomDetailsScreen = ({route}: {route: any}) => {
   const data: TRoom = route.params.roomDetails;
   //console.log(JSON.stringify(data, null, 2));
   const room_id = data.id; // WAŻNE
-  console.log('state:', JSON.stringify(state, null, 2));
+  //console.log('state:', JSON.stringify(state, null, 2));
   //Fetch for room data???
   //REDIRECTION TO WHICH BOOKING CURRENTLY OCCUPIES ROOM
   //THE DATE OF OCCUPATION OF THE ROOM
@@ -71,20 +72,21 @@ const RoomDetailsScreen = ({route}: {route: any}) => {
     },
   ];
 
+//console.log(flattenObj());
+
   //fetch inser data TODO use react querry  // czy dodąć params do state? xD
   const fetchData = async () => {
     try {
       console.log('trying to fetch');
-      let {data: room, error} = await supabase
-        .from('room') //room_class_id(class_name),status_id(status_name),floor_id(floor_number)
+        let roomsQuery = supabase.from('room')
         .select(
           'id,status_id(status_name),floor_id(floor_number),room_class_id(class_name,room_class_bed_type(num_beds,bed_type_id(bed_type_name)),base_price,room_class_feature(feature_id(feature_name)))',
         )
         .eq('id', room_id);
-      //console.log('rooms', room);
-      //console.info('stringify:', JSON.stringify(room, null, 2));
-
-      setState(room); //I dont know what is happening, where is the types mismatch
+        const {data,error} = await roomsQuery
+        const RoomsData = data // do the type assertion here? 
+        console.info('stringify:', JSON.stringify(RoomsData, null, 2));
+        setState(RoomsData);
       if (error) {
         console.error('Error fetching data:', error);
       }
@@ -99,7 +101,7 @@ const RoomDetailsScreen = ({route}: {route: any}) => {
       <Text>RoomDetailsScreen</Text>
       <Text> IMAGE OF THE ROOM</Text>
       <Button title="FETCH DATA" onPress={() => fetchData()}></Button>
-      {state ? <RoomComponentFull props={state} /> : null}
+      {state ? <RoomComponentFull item={state[0]} /> : null}
     </ScrollView>
   );
 };
