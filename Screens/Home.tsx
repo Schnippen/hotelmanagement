@@ -73,12 +73,19 @@ function HomeScreen({navigation}: any) {
           onPress={() => navigation.navigate('AddBookingCalendar')}
           style={{marginVertical: 8}}
         />
+        <Button
+          title="AuthLoginScreen  "
+          onPress={() => navigation.navigate('AuthLoginScreen')}
+          style={{marginVertical: 8}}
+        />
         {myIcon}
         <Text>TODO:</Text>
         <Text>CREATE FEATURE LIST</Text>
         <Text>CREATE EDGE FUNCTION WITH CRON JOBS</Text>
         <Text>START USING TANSTACK QUERY - REACT QUERY for REACT NATIVE</Text>
         <Text>Create SCREEN FOR SETTING ROOM</Text>
+        <Text>Create AUTH</Text>
+
       </View>
     </ScrollView>
   );

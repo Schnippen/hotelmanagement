@@ -14,6 +14,7 @@ import {
 import {RootState} from './Store/store';
 import AddBookingCalendar from './Screens/AddBookingCalendar';
 import RoomDetailsScreen from './Screens/RoomDetailsScreen';
+import { AuthLoginScreen } from './Screens/AuthLoginScreen';
 
 function MainApp() {
   const Stack = createNativeStackNavigator();
@@ -46,6 +47,10 @@ function MainApp() {
         <Stack.Screen
           name="AddBookingCalendar"
           component={AddBookingCalendar}
+        />
+         <Stack.Screen
+          name="AuthLoginScreen"
+          component={AuthLoginScreen}
         />
       </Stack.Navigator>
     </NavigationContainer>
