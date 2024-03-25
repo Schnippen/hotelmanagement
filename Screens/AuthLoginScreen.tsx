@@ -35,6 +35,7 @@ export const AuthLoginScreen = () => {
       Alert.alert('Please check your inbox for email verification!');
     setLoading(false);
     if (error) Alert.alert(error.message);
+    if (error) console.log(error);
   }
 
   async function signOut() {

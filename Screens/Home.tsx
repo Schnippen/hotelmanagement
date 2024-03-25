@@ -77,8 +77,13 @@ function HomeScreen({navigation}: any) {
           style={{marginVertical: 8}}
         />
         <Button
-          title="AuthLoginScreen  "
+          title="AuthLoginScreen"
           onPress={() => navigation.navigate('AuthLoginScreen')}
+          style={{marginVertical: 8}}
+        />
+        <Button
+          title="TaskListScreen"
+          onPress={() => navigation.navigate('TaskListScreen')}
           style={{marginVertical: 8}}
         />
         {myIcon}

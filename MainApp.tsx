@@ -18,11 +18,12 @@ import {AuthLoginScreen} from './Screens/AuthLoginScreen';
 import {Session} from '@supabase/supabase-js';
 import {supabase} from './Supabase/supabase';
 import {SET_GLOBAL_AUTH_SESSION} from './Store/Reducers/setAuthSessionGlobal';
+import TaskListScreen from './Screens/TaskListScreen';
 
 function MainApp() {
   const Stack = createNativeStackNavigator();
   const dispatch = useDispatch();
-
+  //https://tanstack.com/query/v5/docs/framework/react/react-native
   //SUPABASE AUTH SESSION
   //const [AUTHsession, setSession] = useState<Session | null>(null); //make it in REDUX
   useEffect(() => {
@@ -68,10 +69,18 @@ function MainApp() {
           name="AddBookingCalendar"
           component={AddBookingCalendar}
         />
-        <Stack.Screen name="AuthLoginScreen" component={AuthLoginScreen} />
+
+        <Stack.Screen name="TaskListScreen" component={TaskListScreen} />
+        <Stack.Group
+          screenOptions={{headerStyle: {backgroundColor: 'papayawhip'}}}>
+          <Stack.Screen name="AuthLoginScreen" component={AuthLoginScreen} />
+        </Stack.Group>
       </Stack.Navigator>
     </NavigationContainer>
   );
 }
 
 export default MainApp;
+/*         <Stack.Group navigationKey={isSignedIn ? 'user' : 'guest'}>
+          screens 
+        </Stack.Group>; */

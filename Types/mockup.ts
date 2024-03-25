@@ -447,12 +447,38 @@ const MOCKUP_AUTHsession = {
 /* async function signOut() {
   const {error} = await supabase.auth.signOut();
 } */ //https://supabase.com/docs/guides/auth/sessions may be usefull
-/* todo-table
-  user FK =
-  TASK = Text
-  is complete = Boolean??
-  */
-/*users-table 
-  user
-  role?
-  */
+/* Admin:  RBAC
+
+Full access to all features and data.
+Can manage users, rooms, bookings, and other resources.
+Can perform CRUD operations on all data entities.
+Can configure system settings and permissions.
+Front Desk Staff:
+
+Access to booking management features.
+Can view, create, update, and delete bookings.
+Access to room status information (occupied, vacant, reserved).
+Limited access to financial data (billing, payments).
+Housekeeping:
+
+Access to room status information.
+Can update room status (cleaning, maintenance, inspection).
+View room service requests and work orders.
+Maintenance Staff:
+
+Access to maintenance requests.
+Can view, update, and close maintenance tickets.
+Access to room status information for maintenance purposes.
+Guest:
+
+Limited access to self-service features.
+Can view own bookings, check-in/check-out status.
+Can request room service, maintenance, or other services.
+Access to guest-facing features such as room service menu, amenities, and local information.
+Manager:
+
+Similar to Admin but with restricted permissions.
+Can view financial reports, occupancy rates, and other analytics.
+Can manage staff schedules, shifts, and assignments.
+Can approve or reject special requests and discounts.
+ */
