@@ -375,6 +375,48 @@ let mockupRoomDetailsSceen = [
     },
   },
 ];
+
+const MOCKUP_AUTHsession = {
+  access_token:
+    'eyJhbGciOiJIUzI1NiIsImtpZCI6IlYybU81RGcrYWVkM2xZUmMiLCJ0eXAiOiJKV1QifQ.eyJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzExMzgwMTU2LCJpYXQiOjE3MTEzNzY1NTYsImlzcyI6Imh0dHBzOi8vcWZiYWF2Z3RuY3BsbnZocm9udWMuc3VwYWJhc2UuY28vYXV0aC92MSIsInN1YiI6IjgzYjM0M2QxLTMyMGEtNDdhYS05NGRiLTJmYmMyNmQ5YzY1YyIsImVtYWlsIjoiZXhhbXBsZUBlbWFpbC5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7fSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTcxMTM3NjU1Nn1dLCJzZXNzaW9uX2lkIjoiNzJkZGZmZTYtNmNiZi00YjBiLWFmYTQtOGY4MWVjZTdiZWJhIn0.Zx-T88sdcBtqBByRZ5lXd5n9X541XUuujh-4ojYcQA0',
+  token_type: 'bearer',
+  expires_in: 3600,
+  expires_at: 1711380156,
+  refresh_token: 'oZPf526W1nt5EIA1fgridQ',
+  user: {
+    id: '83b343d1-320a-47aa-94db-2fbc26d9c65c',
+    aud: 'authenticated',
+    role: 'authenticated',
+    email: 'example@email.com',
+    email_confirmed_at: '2024-03-25T14:22:16.924603Z',
+    phone: '',
+    confirmed_at: '2024-03-25T14:22:16.924603Z',
+    last_sign_in_at: '2024-03-25T14:22:36.083528542Z',
+    app_metadata: {provider: 'email', providers: ['email']},
+    user_metadata: {},
+    identities: [
+      {
+        identity_id: '4177cf17-d89f-4c16-bca5-f3e22ca97968',
+        id: '83b343d1-320a-47aa-94db-2fbc26d9c65c',
+        user_id: '83b343d1-320a-47aa-94db-2fbc26d9c65c',
+        identity_data: {
+          email: 'example@email.com',
+          email_verified: false,
+          phone_verified: false,
+          sub: '83b343d1-320a-47aa-94db-2fbc26d9c65c',
+        },
+        provider: 'email',
+        last_sign_in_at: '2024-03-25T14:22:16.921699Z',
+        created_at: '2024-03-25T14:22:16.921757Z',
+        updated_at: '2024-03-25T14:22:16.921757Z',
+        email: 'example@email.com',
+      },
+    ],
+    created_at: '2024-03-25T14:22:16.905095Z',
+    updated_at: '2024-03-25T14:22:36.086071Z',
+  },
+};
+
 //TODO calendar theme
 /*   theme={{
       backgroundColor: '#ffffff',
@@ -402,3 +444,15 @@ let mockupRoomDetailsSceen = [
       textMonthFontSize: 16,
       textDayHeaderFontSize: 16
     }} */
+/* async function signOut() {
+  const {error} = await supabase.auth.signOut();
+} */ //https://supabase.com/docs/guides/auth/sessions may be usefull
+/* todo-table
+  user FK =
+  TASK = Text
+  is complete = Boolean??
+  */
+/*users-table 
+  user
+  role?
+  */

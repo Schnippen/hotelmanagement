@@ -1,6 +1,6 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import RoomsScreen from './Screens/RoomsScreen';
 import CurrentBookingsScreen from './Screens/CurrentBookingsScreen';
 import CalendarScreen from './Screens/Calendar';
@@ -14,11 +14,31 @@ import {
 import {RootState} from './Store/store';
 import AddBookingCalendar from './Screens/AddBookingCalendar';
 import RoomDetailsScreen from './Screens/RoomDetailsScreen';
-import { AuthLoginScreen } from './Screens/AuthLoginScreen';
+import {AuthLoginScreen} from './Screens/AuthLoginScreen';
+import {Session} from '@supabase/supabase-js';
+import {supabase} from './Supabase/supabase';
+import {SET_GLOBAL_AUTH_SESSION} from './Store/Reducers/setAuthSessionGlobal';
 
 function MainApp() {
   const Stack = createNativeStackNavigator();
   const dispatch = useDispatch();
+
+  //SUPABASE AUTH SESSION
+  //const [AUTHsession, setSession] = useState<Session | null>(null); //make it in REDUX
+  useEffect(() => {
+    supabase.auth.getSession().then(({data: {session}}) => {
+      //setSession(session);
+      dispatch(SET_GLOBAL_AUTH_SESSION(session));
+    });
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      //setSession(session);
+      dispatch(SET_GLOBAL_AUTH_SESSION(session));
+    });
+  }, []);
+  //console.log('AUTHsession:', JSON.stringify(AUTHsession, null));
+  //const GLOBALAUTH = useSelector((state: RootState) => state.authGlobal.value);
+  //console.log('GLOBALAUTH', GLOBALAUTH);
 
   useEffect(() => {
     console.info('first useEffect()');
@@ -48,10 +68,7 @@ function MainApp() {
           name="AddBookingCalendar"
           component={AddBookingCalendar}
         />
-         <Stack.Screen
-          name="AuthLoginScreen"
-          component={AuthLoginScreen}
-        />
+        <Stack.Screen name="AuthLoginScreen" component={AuthLoginScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -2,14 +2,17 @@ import 'react-native-url-polyfill/auto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {createClient} from '@supabase/supabase-js';
 import {REACT_NATIVE_SUPABASE_URL, REACT_NATIVE_SUPABASE_ANON_KEY} from '@env';
-import 'react-native-get-random-values'
+import 'react-native-get-random-values';
 import CryptoJS from 'crypto-js';
 import * as Keychain from 'react-native-keychain';
+import {AppState} from 'react-native';
 
 class LargeSecureStore {
   async _encrypt(key: string, value: string): Promise<string> {
     const encryptionKey = CryptoJS.lib.WordArray.random(256 / 8);
-    const encryptedValue = CryptoJS.AES.encrypt(value, encryptionKey, { mode: CryptoJS.mode.CTR });
+    const encryptedValue = CryptoJS.AES.encrypt(value, encryptionKey, {
+      mode: CryptoJS.mode.CTR,
+    });
 
     await AsyncStorage.setItem(key, encryptedValue.toString());
     await Keychain.setGenericPassword(key, encryptionKey.toString());
@@ -18,7 +21,7 @@ class LargeSecureStore {
   }
 
   async _decrypt(key: string, value: string): Promise<string | null> {
-    const keychainResult = await Keychain.getGenericPassword({ service: key });
+    const keychainResult = await Keychain.getGenericPassword({service: key});
     if (!keychainResult || !keychainResult.password) {
       return null; // Handle case where encryption key is not found
     }
@@ -39,7 +42,7 @@ class LargeSecureStore {
 
   async removeItem(key: string): Promise<void> {
     await AsyncStorage.removeItem(key);
-    await Keychain.resetGenericPassword({ service: key });
+    await Keychain.resetGenericPassword({service: key});
   }
 
   async setItem(key: string, value: string): Promise<void> {
@@ -59,6 +62,18 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     detectSessionInUrl: false,
   },
+});
+// Tells Supabase Auth to continuously refresh the session automatically
+// if the app is in the foreground. When this is added, you will continue
+// to receive `onAuthStateChange` events with the `TOKEN_REFRESHED` or
+// `SIGNED_OUT` event if the user's session is terminated. This should
+// only be registered once.
+AppState.addEventListener('change', state => {
+  if (state === 'active') {
+    supabase.auth.startAutoRefresh();
+  } else {
+    supabase.auth.stopAutoRefresh();
+  }
 });
 
 //https://supabase.com/blog/react-native-authentication

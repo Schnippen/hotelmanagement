@@ -12,6 +12,8 @@ import {supabase} from '../Supabase/supabase';
 //import { supabase } from '../Supabase/supabase';
 import {Button} from '@rneui/base';
 import {Icon} from '@rneui/themed';
+import {useSelector} from 'react-redux';
+import {RootState} from '../Store/store';
 
 function HomeScreen({navigation}: any) {
   const isDarkMode = useColorScheme() === 'dark';
@@ -33,6 +35,7 @@ function HomeScreen({navigation}: any) {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
   const myIcon = <Icon name="rocket" size={30} color="#900" />;
+  const GLOBALAUTH = useSelector((state: RootState) => state.authGlobal.value);
 
   return (
     <ScrollView
@@ -79,13 +82,14 @@ function HomeScreen({navigation}: any) {
           style={{marginVertical: 8}}
         />
         {myIcon}
+        <Text>{GLOBALAUTH?.user.email}</Text>
         <Text>TODO:</Text>
         <Text>CREATE FEATURE LIST</Text>
         <Text>CREATE EDGE FUNCTION WITH CRON JOBS</Text>
         <Text>START USING TANSTACK QUERY - REACT QUERY for REACT NATIVE</Text>
         <Text>Create SCREEN FOR SETTING ROOM</Text>
-        <Text>Create AUTH</Text>
-
+        <Text>Create Logout</Text>
+        <Text>Create TODO LIST</Text>
       </View>
     </ScrollView>
   );
