@@ -8,6 +8,16 @@ import { RootState } from '../Store/store';
 interface TroomTypes {
   class_name: string;
 }
+type TRoomDetails = {
+  id: string;
+  room_number: string;
+  room_class_id: {
+    class_name: string;
+  };
+  floor_id: {
+    floor_number: string;
+  };
+};
 
 function BookingChartScreen({navigation, route}: any) {
   let shitSTATE=  [
@@ -21,12 +31,48 @@ function BookingChartScreen({navigation, route}: any) {
       "class_name": "Suite"
     }
   ]
+  let PUPUstate:TRoomDetails[]=  [
+    {
+      "id": "4fac5959-62c8-41a8-855a-e149e4fc6c76",
+      "room_number": "2",
+      "room_class_id": {
+        "class_name": "Deluxe"
+      },
+      "floor_id": {
+        "floor_number": "1st Floor"
+      }
+    },
+    {
+      "id": "0fad24a2-035e-4d12-9964-9ba84b4373c2",
+      "room_number": "1",
+      "room_class_id": {
+        "class_name": "Standard"
+      },
+      "floor_id": {
+        "floor_number": "2nd Floor"
+      }
+    },
+    {
+      "id": "b79b8ae7-e19a-4485-8f03-4215b943aca6",
+      "room_number": "3",
+      "room_class_id": {
+        "class_name": "Suite"
+      },
+      "floor_id": {
+        "floor_number": "3rd Floor"
+      }
+    }
+  ]
 const [state,setState]=useState<any>(null)
 const [roomTypes,setRoomTypes]=useState<TroomTypes[]|null>(shitSTATE)
-const [roomDetail,setRoomDetails]=useState<any>(null)
+const [roomDetail,setRoomDetails]=useState<any>(PUPUstate)
 
 const {currentDay,monthFullName,monthNumber} = route.params;
 const [monthState,setMonthState]=useState<number>(monthNumber)
+const [data,setData]=useState<any>([ 
+  { id: 1, room_number: '101', room_class: 'Standard' },
+{ id: 2, room_number: '102', room_class: 'Deluxe' },
+{ id: 3, room_number: '201', room_class: 'Standard' }]) //for populating room rows
 
 const fullNames =["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 const roomTypesToDisplay= roomTypes?"roomTypes":"ROOM TYPE"
@@ -41,28 +87,45 @@ const currentDate = new Date(currentDay);
   const earlier_date = currentDate.toISOString();
   console.log("later_date",later_date,"earlier_date",earlier_date)
 
-const fetchData = async () => {
+  const fetchData = async () => {
     try {
       console.log('trying to fetch');
-      let {data: booking, error} = await supabase
-        .from('booking')
-        .select(
-          '*,payment_status(payment_status_name), booking_room(room_id(status_id(status_name))),guest_id(first_name,last_name)',
-        )
-    .filter('checkin_date', 'lte', later_date)//later_date
-    .filter('checkout_date', 'gte', earlier_date); //earlier_date
-      //.filter('checkout_date', 'gte', second)
+  
+      // Fetch booking and room data simultaneously
+      const [bookingResponse, roomResponse] = await Promise.all([
+        supabase.from('booking')
+          .select('booking_room(room_id(*)),guest_id(first_name,last_name),booking_color')
+          .filter('checkin_date', 'lte', later_date)
+          .filter('checkout_date', 'gte', earlier_date),
+        supabase.from('room')
+          .select('id,room_number,room_class_id(class_name),floor_id(floor_number)'),
+      ]);
+  
+      const { data: booking, error: bookingError } = bookingResponse;
+      const { data: room, error: roomError } = roomResponse;
+  
       console.log('booking', booking);
-      console.info('stringify:', JSON.stringify(booking, null, 2));
+      console.log('room', room);
+  
+      console.info('stringify booking:', JSON.stringify(booking, null, 2));
+      console.info('stringify room:', JSON.stringify(room, null, 2));
+  
       setState(booking);
-      if (error) {
-        console.error('Error fetching data:', error);
+      setRoomDetails(room);
+  
+      // Handle errors from both requests
+      if (bookingError) {
+        console.error('Error fetching booking data:', bookingError);
+      }
+      if (roomError) {
+        console.error('Error fetching room data:', roomError);
       }
     } catch (error) {
       console.error('Error fetching data:', error);
       return error;
     }
   };
+  
   const fetchData2 = async () => {
     try {
       console.log('trying to fetch');
@@ -82,25 +145,7 @@ const fetchData = async () => {
       return error;
     }
   };
-  const fetchData3 = async () => {
-    try {
-      console.log('trying to fetch');
-      let {data: room, error} = await supabase
-        .from('room') //fetching room types
-        .select(
-          'id,room_number,room_class_id(class_name),floor_id(floor_number)',
-        )//'id,room_number,room_class_id(class_name),floor_id(floor_number)',
-      console.log('room', room);
-      console.info('stringify:', JSON.stringify(room, null, 2));
-      setRoomDetails(room);
-      if (error) {
-        console.error('Error fetching data:', error);
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      return error;
-    }
-  };
+
 //TODO fetch room type and ROOms for ROOM TYPE in room occupancy component
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -108,14 +153,22 @@ const IconCalendar = <Icon name="edit-calendar" size={30} color="black" />;
 
 const date = new Date();
 //console.log("date:",date,windowHeight,windowWidth,monthName,dayName)
-
+/* const data:Tdata[]= [
+  { id: '1', text: "" },
+  { id: '2', text: 'Item 2' },
+  { id: '3', text: 'Item 3' },
+  // Add more data as needed
+]; */
 const nextThreeDays: string[] = []; // Change type to string[]
+const nextThreeDaysFull: string[] = []; // Change type to string[]
+
 for (let i = 0; i < 3; i++) {
   const nextDate = new Date();
   nextDate.setDate(date.getDate() + i);
   nextThreeDays.push(nextDate.toDateString());
-}
-
+  nextThreeDaysFull.push(nextDate.toISOString().split("T")[0].concat("T00:00:00Z"))
+  //console.log(nextDate.toISOString().split("T")[0].concat("T00:00:00Z"))
+} console.log(nextThreeDaysFull)
 const DayPanel = ({ date }: { date: string }) => {    
     const dateSplited=date.split(" ")
     const dayName=dateSplited[0]
@@ -176,21 +229,30 @@ type Tdata={
     id: string;
     text: string;
 }
-const data:Tdata[]= [
-    { id: '1', text: 'Item 1' },
-    { id: '2', text: 'Item 2' },
-    { id: '3', text: 'Item 3' },
-    { id: '4', text: 'Item 4' },
-    { id: '5', text: 'Item 5' },
-    { id: '6', text: 'Item 6' },
-    // Add more data as needed
-  ];
 
-  const RoomItem = ({ item }: { item: Tdata }) => (
+
+const shit=()=>{
+  // Assuming you have booking and room data
+let pipi:any = state
+// Extract the room ID from each booking
+const bookingRoomIds = pipi.map(pipi => pipi.booking_room.room_id.id);
+console.log(bookingRoomIds)
+// Check if any room ID matches the room ID from the bookings
+const hasMatchingRoom = roomDetail.some(roomDetail => bookingRoomIds.includes(roomDetail.id));
+console.log(hasMatchingRoom)
+// Render view if there is a matching room
+if (hasMatchingRoom) {
+  // Render your view here
+}
+}
+  const RoomItem = ({ item }: { item: any }) => {
+    //console.log("ROOM ITEM:",item)
+
+    return(
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', height: 80,backgroundColor:"white",borderWidth: 1,borderColor:"lightgray",width:windowWidth/3 }}>
-      <Text>{item.text}</Text>
+      <Text>"sa"</Text>
     </View>
-  );
+  )};
 const RoomsOccupancyList=()=>{
     return(
         //here flatlist to do more nesting
@@ -200,8 +262,8 @@ const RoomsOccupancyList=()=>{
         </View>
         <FlatList
         //horizontal={true}
-        data={data.slice(0,3)}// TODO change that
-        keyExtractor={(item, index:number) => item.id}
+        data={data.slice(0,3)}// TODO change that //state
+        keyExtractor={(item, index:number) => `${index}`}
         renderItem={RoomItem}
         numColumns={3}
         //getItemLayout
@@ -209,31 +271,75 @@ const RoomsOccupancyList=()=>{
       </View>
     )
 }
-
+//TODO consider if I really need FLATLISTS xD? 
 const RoomsOccupancyList2 = () => {
   // Assuming roomTypesToDisplay is an array of room types
-  const RenderRoomType = ({ item }:{item:TroomTypes}) => {return(
+  const RenderRoomType = ({ item }:{item:TRoomDetails}) => {
+    //console.log(item)
+    return(
       <View style={{ backgroundColor: "red", width: windowWidth, flexDirection: "row" }}>
           <View style={{ backgroundColor: "lightblue", width: windowWidth / 6, height: 80, justifyContent: 'center', alignItems: "center" }}>
-              <Text>{item.class_name}</Text>
+              <Text>{item.room_class_id.class_name}</Text>
+              <Text>{item.room_number}</Text>
+              <Text>{item.floor_id.floor_number}</Text>
           </View>
           <FlatList
             horizontal
               data={data.slice(0, 3)} // Assuming data contains occupancy data for each room type
-              keyExtractor={(item, index) => `${item.id}-${index}`}
+              keyExtractor={(item, index) => `${item}-${index}`}
               renderItem={RoomItem}
           />
       </View>
   )}
 
   return (
+   < View>
+    <TopPanel2/>
       <FlatList
-          data={roomTypes}
+          data={roomDetail}
           keyExtractor={(item, index) => `${index}`}
           renderItem={RenderRoomType}
+          
       />
+      </View>
   );
 }
+const TopPanel2 = () => {
+  const DayPanel = ({ date }: { date: string }) => {    
+    const dateSplited = date.split(" ");
+    const dayName = dateSplited[0];
+    const month = dateSplited[1];
+    const dayNumber = dateSplited[2];
+  
+    return (
+      <View style={{width:windowWidth/3, height: 80, flex: 1, backgroundColor: "white", borderWidth: 1, borderColor: "lightgray" }}>
+        <Text>{dayName}</Text>
+        <Text>{month}</Text>
+        <Text>{dayNumber}</Text>
+      </View>
+    );
+  }
+
+  const renderItem = ({ item }: { item: string }) => <DayPanel date={item} />;
+
+  return (
+    <View>
+      <View style={{ height: 80, backgroundColor: "red", width: windowWidth, flexDirection: 'row' }}>
+        <TouchableOpacity style={{ width: windowWidth / 6, justifyContent: "center", alignItems: "center" }} activeOpacity={0.2} onPress={() => console.log("press Calendar")}>
+          {IconCalendar} 
+        </TouchableOpacity>
+        <FlatList
+        horizontal
+          data={nextThreeDays}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+        />
+      </View>
+    </View>
+  );
+}
+
+
 return (
   <View style={{ flex: 1, backgroundColor: "pink" }}>
     <MonthPanel/>
@@ -242,13 +348,14 @@ return (
     <Text>BookingChartScreen SEPARATOR</Text>
     <Button title={"fetch data bookings"} onPress={()=>fetchData()}/>
     <Button title={"fetch data rooms"} onPress={()=>fetchData2()}/>
-    <Button title={"fetch data roomsnumbers"} onPress={()=>fetchData3()}/>
+    <Button title={"shit"} onPress={()=>shit()}/>
+
     <RoomsOccupancyList2/>
   </View>
 );
 }
 export default BookingChartScreen
-
+//TODO Unify styles
 let mockupFETCh=  [
     {
       "id": "4fac5959-62c8-41a8-855a-e149e4fc6c76",
@@ -295,3 +402,4 @@ let mockupFETCh=  [
         //getItemLayout
       />
         </View> */
+        
