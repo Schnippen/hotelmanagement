@@ -1,12 +1,11 @@
 import React, {useState} from 'react';
 import {View, StyleSheet, Text, Button} from 'react-native';
-import {Calendar, CalendarList, DateData} from 'react-native-calendars';
+import {Calendar} from 'react-native-calendars';
 import {supabase} from '../Supabase/supabase';
 import {TBooking, TBookingUpdated, periods} from '../Types/types';
 import {
   calculateCurrentDate,
   calculateReservationDays,
-  changeDateFormat,
   createReservationPeriod,
   populateCalendar,
   updateDateFormat,

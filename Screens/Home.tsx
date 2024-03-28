@@ -50,17 +50,14 @@ function HomeScreen({navigation}: any) {
         <Button
           title="Go to calendar"
           onPress={() => navigation.navigate('CalendarScreen')}
-          style={{marginVertical: 8}}
         />
         <Button
           title="Go to RoomsScreen"
           onPress={() => navigation.navigate('RoomsScreen')}
-          style={{marginVertical: 8}}
         />
         <Button
           title="Go to CurrentBookingsScreen"
           onPress={() => navigation.navigate('CurrentBookingsScreen')}
-          style={{marginVertical: 8}}
         />
         <Button
           onPress={() => navigation.navigate('Settings')}
@@ -74,18 +71,21 @@ function HomeScreen({navigation}: any) {
         <Button
           title="AddBookingCalendar"
           onPress={() => navigation.navigate('AddBookingCalendar')}
-          style={{marginVertical: 8}}
         />
         <Button
           title="AuthLoginScreen"
           onPress={() => navigation.navigate('AuthLoginScreen')}
-          style={{marginVertical: 8}}
         />
         <Button
           title="TaskListScreen"
           onPress={() => navigation.navigate('TaskListScreen')}
-          style={{marginVertical: 8}}
         />
+        <Button title="AgendaScreen"
+          onPress={() => navigation.navigate('AgendaScreen')}/>
+          <Button title="DashboardScreen"
+          onPress={() => navigation.navigate('DashboardScreen')}/>
+        <Button title="BookingChartScreen"
+        onPress={() => navigation.navigate('BookingChartScreen')}/>
         {myIcon}
         <Text>{GLOBALAUTH?.user.email}</Text>
         <Text>TODO:</Text>
@@ -95,6 +95,7 @@ function HomeScreen({navigation}: any) {
         <Text>Create SCREEN FOR SETTING ROOM</Text>
         <Text>Create Logout</Text>
         <Text>Create TODO LIST</Text>
+        <Text>Create Dashboard</Text>
       </View>
     </ScrollView>
   );
@@ -120,3 +121,5 @@ const styles = StyleSheet.create({
 });
 
 export default HomeScreen;
+// /https://play.google.com/store/apps/details?id=com.djubo.flushroom&hl=pl&gl=US
+//https://apps.apple.com/pl/app/azhotel-hotel-management/id1528011931?l=pl

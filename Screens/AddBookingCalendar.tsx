@@ -100,7 +100,7 @@ function AddBookingCalendar({
     const markedDates = Array.from({length: howManyDays}, (_, index) => {
       const dateToAdd = new Date(choosenDate);
       const increment = subtractedDates < 0 ? -1 : 1; // Increment value based on positive or negative subtractedDates
-      dateToAdd.setDate(dateToAdd.getDate() + increment * index);
+      dateToAdd.setDate(dateToAdd.getDate() + increment * index); //TODO naprawć bug
       const isLastDay = index === howManyDays - 1;
 
       console.log(

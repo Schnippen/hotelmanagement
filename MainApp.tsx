@@ -18,6 +18,9 @@ import {AuthLoginScreen} from './Screens/AuthLoginScreen';
 import {supabase} from './Supabase/supabase';
 import {SET_GLOBAL_AUTH_SESSION} from './Store/Reducers/setAuthSessionGlobal';
 import TaskListScreen from './Screens/TaskListScreen';
+import AgendaScreen from './Screens/AgendaScreen';
+import BookingChartScreen from './Screens/BookingChartScreen';
+import DashboardScreen from './Screens/DashboardScreen';
 
 function MainApp() {
   const Stack = createNativeStackNavigator();
@@ -68,13 +71,21 @@ function MainApp() {
           name="AddBookingCalendar"
           component={AddBookingCalendar}
         />
-
+        <Stack.Screen
+        name="AgendaScreen"
+        component={AgendaScreen}
+        />
+      <Stack.Screen
+        name="BookingChartScreen"
+        component={BookingChartScreen}
+        />
+      <Stack.Screen name="DashboardScreen" component={DashboardScreen} />
         <Stack.Screen name="TaskListScreen" component={TaskListScreen} />
-        <Stack.Group
+        <Stack.Group //Auth Screens
           screenOptions={{headerStyle: {backgroundColor: 'papayawhip'}}}>
           <Stack.Screen name="AuthLoginScreen" component={AuthLoginScreen} />
         </Stack.Group>
-      </Stack.Navigator>
+      </Stack.Navigator>  
     </NavigationContainer>
   );
 }
