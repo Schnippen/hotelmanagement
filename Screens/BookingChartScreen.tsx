@@ -10,25 +10,28 @@ interface TroomTypes {
 }
 
 function BookingChartScreen({navigation, route}: any) {
+  let shitSTATE=  [
+    {
+      "class_name": "Standard"
+    },
+    {
+      "class_name": "Deluxe"
+    },
+    {
+      "class_name": "Suite"
+    }
+  ]
 const [state,setState]=useState<any>(null)
-const [roomTypes,setRoomTypes]=useState<TroomTypes[]|null>(null)
+const [roomTypes,setRoomTypes]=useState<TroomTypes[]|null>(shitSTATE)
+const [roomDetail,setRoomDetails]=useState<any>(null)
+
 const {currentDay,monthFullName,monthNumber} = route.params;
 const [monthState,setMonthState]=useState<number>(monthNumber)
 
 const fullNames =["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
 const roomTypesToDisplay= roomTypes?"roomTypes":"ROOM TYPE"
 //console.log("FullMonth",fullNames[monthNumber])
-let shitSTATE=  [
-  {
-    "class_name": "Standard"
-  },
-  {
-    "class_name": "Deluxe"
-  },
-  {
-    "class_name": "Suite"
-  }
-]
+
 const currentDate = new Date(currentDay);
   // Create a new Date object for 5 days later
   const futureDate = new Date(currentDate);
@@ -71,6 +74,25 @@ const fetchData = async () => {
       console.log('room_class', room);
       console.info('stringify:', JSON.stringify(room, null, 2));
       setRoomTypes(room);
+      if (error) {
+        console.error('Error fetching data:', error);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      return error;
+    }
+  };
+  const fetchData3 = async () => {
+    try {
+      console.log('trying to fetch');
+      let {data: room, error} = await supabase
+        .from('room') //fetching room types
+        .select(
+          'id,room_number,room_class_id(class_name),floor_id(floor_number)',
+        )//'id,room_number,room_class_id(class_name),floor_id(floor_number)',
+      console.log('room', room);
+      console.info('stringify:', JSON.stringify(room, null, 2));
+      setRoomDetails(room);
       if (error) {
         console.error('Error fetching data:', error);
       }
@@ -184,19 +206,44 @@ const RoomsOccupancyList=()=>{
         numColumns={3}
         //getItemLayout
       />
-        </View>
+      </View>
     )
+}
+
+const RoomsOccupancyList2 = () => {
+  // Assuming roomTypesToDisplay is an array of room types
+  const RenderRoomType = ({ item }:{item:TroomTypes}) => {return(
+      <View style={{ backgroundColor: "red", width: windowWidth, flexDirection: "row" }}>
+          <View style={{ backgroundColor: "lightblue", width: windowWidth / 6, height: 80, justifyContent: 'center', alignItems: "center" }}>
+              <Text>{item.class_name}</Text>
+          </View>
+          <FlatList
+            horizontal
+              data={data.slice(0, 3)} // Assuming data contains occupancy data for each room type
+              keyExtractor={(item, index) => `${item.id}-${index}`}
+              renderItem={RoomItem}
+          />
+      </View>
+  )}
+
+  return (
+      <FlatList
+          data={roomTypes}
+          keyExtractor={(item, index) => `${index}`}
+          renderItem={RenderRoomType}
+      />
+  );
 }
 return (
   <View style={{ flex: 1, backgroundColor: "pink" }}>
-          <MonthPanel/>
+    <MonthPanel/>
     <TopPanel/>
     <RoomsOccupancyList/>
     <Text>BookingChartScreen SEPARATOR</Text>
     <Button title={"fetch data bookings"} onPress={()=>fetchData()}/>
     <Button title={"fetch data rooms"} onPress={()=>fetchData2()}/>
-    
-
+    <Button title={"fetch data roomsnumbers"} onPress={()=>fetchData3()}/>
+    <RoomsOccupancyList2/>
   </View>
 );
 }
