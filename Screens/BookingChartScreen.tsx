@@ -5,15 +5,30 @@ import { supabase } from '../Supabase/supabase';
 import { useSelector } from 'react-redux';
 import { RootState } from '../Store/store';
 
+interface TroomTypes {
+  class_name: string;
+}
+
 function BookingChartScreen({navigation, route}: any) {
 const [state,setState]=useState<any>(null)
-const [roomTypes,setRoomTypes]=useState<any>(null)
-const [monthState,setMonthState]=useState<any>(null)
-const {currentDay,monthFullName} = route.params;
-const displayMonthFullName = monthState?monthState:monthFullName
+const [roomTypes,setRoomTypes]=useState<TroomTypes[]|null>(null)
+const {currentDay,monthFullName,monthNumber} = route.params;
+const [monthState,setMonthState]=useState<number>(monthNumber)
 
 const fullNames =["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-
+const roomTypesToDisplay= roomTypes?"roomTypes":"ROOM TYPE"
+//console.log("FullMonth",fullNames[monthNumber])
+let shitSTATE=  [
+  {
+    "class_name": "Standard"
+  },
+  {
+    "class_name": "Deluxe"
+  },
+  {
+    "class_name": "Suite"
+  }
+]
 const currentDate = new Date(currentDay);
   // Create a new Date object for 5 days later
   const futureDate = new Date(currentDate);
@@ -93,6 +108,30 @@ const DayPanel = ({ date }: { date: string }) => {
     </View>
   );
 }
+//        <Text h4>{displayMonthFullName}</Text>
+const MonthPanel=()=>{
+  const leftArrow = <Icon name="arrow-left" size={30} color="white" />;
+  const rightArrow = <Icon name="arrow-right" size={30} color="white" />;
+  const handleMonthChange=(direction:string)=>{
+    fullNames.length
+    console.log(monthState,fullNames.length)
+    if (direction === 'right') {
+      monthState===11?setMonthState((monthState)=>0):
+      setMonthState((monthState)=>monthState+1)
+  } else if (direction === 'left') {
+    monthState===0?setMonthState((monthState)=>11):
+    setMonthState((monthState)=>monthState-1)
+  }}
+
+  return(
+    <View style={{flexDirection:'row',alignItems:'center',justifyContent:"space-around",height:60}}>
+      <Button onPress={()=>handleMonthChange("left")} style={{height:40,width:40,backgroundColor:"red"}} title={"chuj"}>{leftArrow}</Button>
+      <Text h4 >{fullNames[monthState]}</Text>
+      <Button onPress={()=>handleMonthChange("right")} style={{height:40,width:40,backgroundColor:"red"}} title={"chuj"}>{rightArrow}</Button>
+    </View>
+  ) 
+
+}
 
 const TopPanel = () => {
   const DaysToRender = nextThreeDays.map((date, index) => {
@@ -101,9 +140,8 @@ const TopPanel = () => {
   //TODO make a calendar Button
   return (
     <View >
-        <Text h4>{displayMonthFullName}</Text>
     <View style={{ height: 80, backgroundColor: "red", width: windowWidth, flexDirection: 'row' }}>
-    <TouchableOpacity style={{width:windowWidth/6,justifyContent:"center",alignItems:"center",}} activeOpacity={0.2} onPress={()=>console.log("press")}>
+    <TouchableOpacity style={{width:windowWidth/6,justifyContent:"center",alignItems:"center",}} activeOpacity={0.2} onPress={()=>console.log("press Calendar")}>
         {IconCalendar} 
     </TouchableOpacity>
       {DaysToRender}
@@ -136,7 +174,7 @@ const RoomsOccupancyList=()=>{
         //here flatlist to do more nesting
         <View style={{backgroundColor:"red", width:windowWidth,flexDirection:"row"}}>
         <View style={{backgroundColor:"lightblue",width:windowWidth/6,height:80,justifyContent:'center',alignItems:"center"}}>
-            <Text>roomTypes state</Text>
+            <Text>{roomTypesToDisplay}</Text>
         </View>
         <FlatList
         //horizontal={true}
@@ -151,11 +189,13 @@ const RoomsOccupancyList=()=>{
 }
 return (
   <View style={{ flex: 1, backgroundColor: "pink" }}>
+          <MonthPanel/>
     <TopPanel/>
-    <Text>BookingChartScreen SEPARATOR</Text>
     <RoomsOccupancyList/>
+    <Text>BookingChartScreen SEPARATOR</Text>
     <Button title={"fetch data bookings"} onPress={()=>fetchData()}/>
     <Button title={"fetch data rooms"} onPress={()=>fetchData2()}/>
+    
 
   </View>
 );
@@ -194,3 +234,17 @@ let mockupFETCh=  [
       }
     }
   ]
+
+/*   <View style={{backgroundColor:"red", width:windowWidth,flexDirection:"row"}}>
+        <View style={{backgroundColor:"lightblue",width:windowWidth/6,height:80,justifyContent:'center',alignItems:"center"}}>
+            <Text>roomTypes state</Text>
+        </View>
+        <FlatList
+        //horizontal={true}
+        data={data.slice(0,3)}// TODO change that
+        keyExtractor={(item, index:number) => item.id}
+        renderItem={RoomItem}
+        numColumns={3}
+        //getItemLayout
+      />
+        </View> */

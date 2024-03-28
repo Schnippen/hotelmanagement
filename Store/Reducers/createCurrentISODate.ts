@@ -4,14 +4,14 @@ import { changeDateFormat } from '../../Utils/functions'
 
 interface TgetCurrentDayInIsoString {
   value: string
-  month:number
+  monthNumber:number
   monthName:string
   monthFullName:string
 }//currentDay
 
 const initialState: TgetCurrentDayInIsoString = {
   value: "",
-  month:0,
+  monthNumber:0,
   monthName:"",
   monthFullName:"",
 }
@@ -45,7 +45,7 @@ export const createCurrentISODate = createSlice({
         const date = new Date(2000, i, 1);
         return date.toLocaleString('en-US', { month: 'long' });
     });
-      state.month=currentMonth
+      state.monthNumber=currentMonth
       state.monthName=monthsOfYear[currentMonth]
       state.monthFullName=monthsOfYearFullName[currentMonth]
     }

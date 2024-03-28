@@ -57,6 +57,9 @@ function MainApp() {
   const monthFullName = useSelector(
     (state: RootState) => state.currentISODate.monthFullName
   );
+  const monthNumber = useSelector(
+    (state: RootState) => state.currentISODate.monthNumber
+  );
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="HomeScreen">
@@ -81,7 +84,7 @@ function MainApp() {
       <Stack.Screen
         name="BookingChartScreen"
         component={BookingChartScreen}
-        initialParams={{currentDay: initialStateForBookingDetailsScreen,monthFullName:monthFullName}}
+        initialParams={{currentDay: initialStateForBookingDetailsScreen,monthFullName:monthFullName,monthNumber:monthNumber}}
         />
       <Stack.Screen name="DashboardScreen" component={DashboardScreen} />
         <Stack.Screen name="TaskListScreen" component={TaskListScreen} />
