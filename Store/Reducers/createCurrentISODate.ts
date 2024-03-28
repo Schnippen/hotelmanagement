@@ -4,10 +4,16 @@ import { changeDateFormat } from '../../Utils/functions'
 
 interface TgetCurrentDayInIsoString {
   value: string
+  month:number
+  monthName:string
+  monthFullName:string
 }//currentDay
 
 const initialState: TgetCurrentDayInIsoString = {
-  value: ""
+  value: "",
+  month:0,
+  monthName:"",
+  monthFullName:"",
 }
 const getCurrentDayInIsoString=()=>{
     const event = new Date()
@@ -30,12 +36,24 @@ export const createCurrentISODate = createSlice({
     SET_CURRENT_ISO_DATE_SHORT:(state)=>{
       const currentDay=getCurrentDayInIsoString()
       state.value = changeDateFormat(currentDay) //change the ISOString  2024-03-09T15:36:25.492Z => 2024-03-09
+    },
+    SET_CURRENT_MONTH:(state)=>{
+      const currentDate = new Date();
+      const currentMonth = currentDate.getMonth();
+      const monthsOfYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const monthsOfYearFullName = Array.from({ length: 12 }, (_, i) => {
+        const date = new Date(2000, i, 1);
+        return date.toLocaleString('en-US', { month: 'long' });
+    });
+      state.month=currentMonth
+      state.monthName=monthsOfYear[currentMonth]
+      state.monthFullName=monthsOfYearFullName[currentMonth]
     }
   },
 })
 
 // Action creators are generated for each case reducer function
-export const { SET_CURRENT_ISO_DATE,SET_CURRENT_ISO_DATE_SHORT} = createCurrentISODate.actions
+export const { SET_CURRENT_ISO_DATE,SET_CURRENT_ISO_DATE_SHORT,SET_CURRENT_MONTH} = createCurrentISODate.actions
 
 export default createCurrentISODate.reducer
 

@@ -21,7 +21,6 @@ function AddBookingCalendar({
   route?: any;
 }) {
   const roomDetails = route?.params?.roomDetails || roomInitialParams;
-  //console.log(JSON.stringify(roomDetails, null, 2))
 
   const [selectedDatesOnCalendar, setSelectedDatesOnCalendar] =
     useState<TselectedDatesOnCalendar>({startingDate: null, endingDate: null});

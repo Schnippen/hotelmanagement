@@ -10,6 +10,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {
   SET_CURRENT_ISO_DATE,
   SET_CURRENT_ISO_DATE_SHORT,
+  SET_CURRENT_MONTH,
 } from './Store/Reducers/createCurrentISODate';
 import {RootState} from './Store/store';
 import AddBookingCalendar from './Screens/AddBookingCalendar';
@@ -33,7 +34,6 @@ function MainApp() {
       //setSession(session);
       dispatch(SET_GLOBAL_AUTH_SESSION(session));
     });
-
     supabase.auth.onAuthStateChange((_event, session) => {
       //setSession(session);
       dispatch(SET_GLOBAL_AUTH_SESSION(session));
@@ -47,13 +47,16 @@ function MainApp() {
     console.info('first useEffect()');
     dispatch(SET_CURRENT_ISO_DATE()); // 2024-03-09T15:36:25.492Z
     dispatch(SET_CURRENT_ISO_DATE_SHORT()); // 2024-03-09 for initial state of BookingDetails Screen
+    dispatch(SET_CURRENT_MONTH())
   }, []);
 
   //initial states for screens params
   const initialStateForBookingDetailsScreen = useSelector(
-    (state: RootState) => state.currentISODate.value,
+    (state: RootState) => state.currentISODate.value
   );
-
+  const monthFullName = useSelector(
+    (state: RootState) => state.currentISODate.monthFullName
+  );
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="HomeScreen">
@@ -78,6 +81,7 @@ function MainApp() {
       <Stack.Screen
         name="BookingChartScreen"
         component={BookingChartScreen}
+        initialParams={{currentDay: initialStateForBookingDetailsScreen,monthFullName:monthFullName}}
         />
       <Stack.Screen name="DashboardScreen" component={DashboardScreen} />
         <Stack.Screen name="TaskListScreen" component={TaskListScreen} />

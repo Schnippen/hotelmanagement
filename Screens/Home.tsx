@@ -18,18 +18,7 @@ import {RootState} from '../Store/store';
 function HomeScreen({navigation}: any) {
   const isDarkMode = useColorScheme() === 'dark';
 
-  /* const  fetchData=async()=>{   
-    let { data: booking, error } = await supabase
-          .from('booking')
-          .select('checkin_date,checkout_date')
-          console.log("SUPABASE DATA:", booking)     
-        console.log("KLIK")
-        if (error) {
-            console.error('Error fetching data:', error);
-            return;
-          }
-} */
-  //name={`${OS ? "ios" : "md"}-stepforward`}
+    //name={`${OS ? "ios" : "md"}-stepforward`}
   let OS = Platform.OS === 'ios';
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,

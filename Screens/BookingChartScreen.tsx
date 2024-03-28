@@ -1,24 +1,76 @@
 import { Button, Icon, Text } from '@rneui/themed'
 import React, { useState } from 'react'
 import { Dimensions, FlatList, Touchable, TouchableOpacity, View } from 'react-native'
+import { supabase } from '../Supabase/supabase';
+import { useSelector } from 'react-redux';
+import { RootState } from '../Store/store';
 
-
-function BookingChartScreen() {
+function BookingChartScreen({navigation, route}: any) {
 const [state,setState]=useState<any>(null)
+const [roomTypes,setRoomTypes]=useState<any>(null)
+const [monthState,setMonthState]=useState<any>(null)
+const {currentDay,monthFullName} = route.params;
+const displayMonthFullName = monthState?monthState:monthFullName
 
+const fullNames =["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+
+const currentDate = new Date(currentDay);
+  // Create a new Date object for 5 days later
+  const futureDate = new Date(currentDate);
+  futureDate.setDate(currentDate.getDate() + 3);
+  // Format the dates to ISO 8601 string format
+  const later_date = futureDate.toISOString();
+  const earlier_date = currentDate.toISOString();
+  console.log("later_date",later_date,"earlier_date",earlier_date)
+
+const fetchData = async () => {
+    try {
+      console.log('trying to fetch');
+      let {data: booking, error} = await supabase
+        .from('booking')
+        .select(
+          '*,payment_status(payment_status_name), booking_room(room_id(status_id(status_name))),guest_id(first_name,last_name)',
+        )
+    .filter('checkin_date', 'lte', later_date)//later_date
+    .filter('checkout_date', 'gte', earlier_date); //earlier_date
+      //.filter('checkout_date', 'gte', second)
+      console.log('booking', booking);
+      console.info('stringify:', JSON.stringify(booking, null, 2));
+      setState(booking);
+      if (error) {
+        console.error('Error fetching data:', error);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      return error;
+    }
+  };
+  const fetchData2 = async () => {
+    try {
+      console.log('trying to fetch');
+      let {data: room, error} = await supabase
+        .from('room_class') //fetching room types
+        .select(
+          'class_name',
+        )//'id,room_number,room_class_id(class_name),floor_id(floor_number)',
+      console.log('room_class', room);
+      console.info('stringify:', JSON.stringify(room, null, 2));
+      setRoomTypes(room);
+      if (error) {
+        console.error('Error fetching data:', error);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      return error;
+    }
+  };
+//TODO fetch room type and ROOms for ROOM TYPE in room occupancy component
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 const IconCalendar = <Icon name="edit-calendar" size={30} color="black" />;
 
-const daysOfWeek = ['Sun', 'Mon', 'Tues', 'Wed', 'Thu', 'Fri', 'Satur'];
-const monthsOfYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const date = new Date();
-const dayIndex = date.getDay();
-const monthIndex = date.getMonth();
-const dayName = daysOfWeek[dayIndex];
-const monthName = monthsOfYear[monthIndex];
-const shit = new Date().getDate()
-//console.log("date:",date,windowHeight,windowWidth,monthName,dayName,shit)
+//console.log("date:",date,windowHeight,windowWidth,monthName,dayName)
 
 const nextThreeDays: string[] = []; // Change type to string[]
 for (let i = 0; i < 3; i++) {
@@ -49,7 +101,7 @@ const TopPanel = () => {
   //TODO make a calendar Button
   return (
     <View >
-        <Text h4>MONTH</Text>
+        <Text h4>{displayMonthFullName}</Text>
     <View style={{ height: 80, backgroundColor: "red", width: windowWidth, flexDirection: 'row' }}>
     <TouchableOpacity style={{width:windowWidth/6,justifyContent:"center",alignItems:"center",}} activeOpacity={0.2} onPress={()=>console.log("press")}>
         {IconCalendar} 
@@ -71,7 +123,6 @@ const data:Tdata[]= [
     { id: '4', text: 'Item 4' },
     { id: '5', text: 'Item 5' },
     { id: '6', text: 'Item 6' },
-
     // Add more data as needed
   ];
 
@@ -82,9 +133,10 @@ const data:Tdata[]= [
   );
 const RoomsOccupancyList=()=>{
     return(
+        //here flatlist to do more nesting
         <View style={{backgroundColor:"red", width:windowWidth,flexDirection:"row"}}>
         <View style={{backgroundColor:"lightblue",width:windowWidth/6,height:80,justifyContent:'center',alignItems:"center"}}>
-            <Text>Room TYPE</Text>
+            <Text>roomTypes state</Text>
         </View>
         <FlatList
         //horizontal={true}
@@ -102,8 +154,43 @@ return (
     <TopPanel/>
     <Text>BookingChartScreen SEPARATOR</Text>
     <RoomsOccupancyList/>
-    <Button title={"fetch data"} onPress={()=>fetchData()}/>
+    <Button title={"fetch data bookings"} onPress={()=>fetchData()}/>
+    <Button title={"fetch data rooms"} onPress={()=>fetchData2()}/>
+
   </View>
 );
 }
 export default BookingChartScreen
+
+let mockupFETCh=  [
+    {
+      "id": "4fac5959-62c8-41a8-855a-e149e4fc6c76",
+      "room_number": "2",
+      "room_class_id": {
+        "class_name": "Deluxe"
+      },
+      "floor_id": {
+        "floor_number": "1st Floor"
+      }
+    },
+    {
+      "id": "0fad24a2-035e-4d12-9964-9ba84b4373c2",
+      "room_number": "1",
+      "room_class_id": {
+        "class_name": "Standard"
+      },
+      "floor_id": {
+        "floor_number": "2nd Floor"
+      }
+    },
+    {
+      "id": "b79b8ae7-e19a-4485-8f03-4215b943aca6",
+      "room_number": "3",
+      "room_class_id": {
+        "class_name": "Suite"
+      },
+      "floor_id": {
+        "floor_number": "3rd Floor"
+      }
+    }
+  ]
