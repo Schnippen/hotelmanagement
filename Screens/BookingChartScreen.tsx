@@ -231,20 +231,15 @@ type Tdata={
 }
 
 
-const shit=()=>{
-  // Assuming you have booking and room data
-let pipi:any = state
-// Extract the room ID from each booking
-const bookingRoomIds = pipi.map(pipi => pipi.booking_room.room_id.id);
-console.log(bookingRoomIds)
-// Check if any room ID matches the room ID from the bookings
-const hasMatchingRoom = roomDetail.some(roomDetail => bookingRoomIds.includes(roomDetail.id));
-console.log(hasMatchingRoom)
-// Render view if there is a matching room
-if (hasMatchingRoom) {
-  // Render your view here
-}
-}
+/* function hasMatchingRooms(){ let data = BOOKING  
+  const bookingRoomIds= data.map(data=>data.booking_room.room_id.id) 
+  console.log(bookingRoomIds)
+  const hasMatchingRoom = ROOM.filter(ROOM => bookingRoomIds.includes(ROOM.id));
+  console.log(hasMatchingRoom)
+  const matchingBookings = BOOKING.filter(booking => bookingRoomIds.includes(booking.booking_room.room_id.id));
+  console.log(matchingBookings);
+} */
+
   const RoomItem = ({ item }: { item: any }) => {
     //console.log("ROOM ITEM:",item)
 
@@ -348,8 +343,7 @@ return (
     <Text>BookingChartScreen SEPARATOR</Text>
     <Button title={"fetch data bookings"} onPress={()=>fetchData()}/>
     <Button title={"fetch data rooms"} onPress={()=>fetchData2()}/>
-    <Button title={"shit"} onPress={()=>shit()}/>
-
+{/*     <Button title={"shit"} onPress={()=>shit()}/>h*/}
     <RoomsOccupancyList2/>
   </View>
 );
