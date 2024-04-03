@@ -4,89 +4,167 @@ import { Dimensions, FlatList, Touchable, TouchableOpacity, View } from 'react-n
 import { supabase } from '../Supabase/supabase';
 import { useSelector } from 'react-redux';
 import { RootState } from '../Store/store';
-
-interface TroomTypes {
-  class_name: string;
-}
-type TRoomDetails = {
-  id: string;
-  room_number: string;
-  room_class_id: {
-    class_name: string;
-  };
-  floor_id: {
-    floor_number: string;
-  };
-};
-
-function BookingChartScreen({navigation, route}: any) {
-  let shitSTATE=  [
+/* const IconCalendar = <Icon name="edit-calendar" size={30} color="black" />;
+<TouchableOpacity style={{width:windowWidth/6,justifyContent:"center",alignItems:"center",}} activeOpacity={0.2} onPress={()=>console.log("press Calendar")}>
+{IconCalendar} 
+</TouchableOpacity> */
+let BOOKING =
+  [
     {
-      "class_name": "Standard"
+      "id": "4e39c081-6889-45ba-b02b-ba42e55bb5c5",
+    "booking_color": "#5f4868",
+    "checkin_date": "2024-04-01T00:00:00+00:00",
+    "checkout_date": "2024-04-07T00:00:00+00:00",
+    "booking_room": {
+      "room_id": {
+        "id": "0fad24a2-035e-4d12-9964-9ba84b4373c2",
+        "floor_id": 5,
+        "status_id": 7,
+        "room_number": "1",
+        "room_class_id": {
+          "id": 7,
+          "base_price": 100,
+          "class_name": "Standard"
+        }
+      }
     },
-    {
+    "guest_id": {
+      "last_name": "Smith",
+      "first_name": "Jane"
+    }
+  }
+]
+ let ROOM= [
+  {
+    "id": "4fac5959-62c8-41a8-855a-e149e4fc6c76",
+    "room_number": "2",
+    "room_class_id": {
       "class_name": "Deluxe"
     },
-    {
+    "floor_id": {
+      "floor_number": "1st Floor"
+    }
+  },
+  {
+    "id": "0fad24a2-035e-4d12-9964-9ba84b4373c2",
+    "room_number": "1",
+    "room_class_id": {
+      "class_name": "Standard"
+    },
+    "floor_id": {
+      "floor_number": "2nd Floor"
+    }
+  },
+  {
+    "id": "b79b8ae7-e19a-4485-8f03-4215b943aca6",
+    "room_number": "3",
+    "room_class_id": {
       "class_name": "Suite"
-    }
-  ]
-  let PUPUstate:TRoomDetails[]=  [
-    {
-      "id": "4fac5959-62c8-41a8-855a-e149e4fc6c76",
-      "room_number": "2",
-      "room_class_id": {
-        "class_name": "Deluxe"
-      },
-      "floor_id": {
-        "floor_number": "1st Floor"
-      }
     },
-    {
-      "id": "0fad24a2-035e-4d12-9964-9ba84b4373c2",
-      "room_number": "1",
-      "room_class_id": {
-        "class_name": "Standard"
-      },
-      "floor_id": {
-        "floor_number": "2nd Floor"
-      }
-    },
-    {
-      "id": "b79b8ae7-e19a-4485-8f03-4215b943aca6",
-      "room_number": "3",
-      "room_class_id": {
-        "class_name": "Suite"
-      },
-      "floor_id": {
-        "floor_number": "3rd Floor"
-      }
+    "floor_id": {
+      "floor_number": "3rd Floor"
     }
-  ]
-const [state,setState]=useState<any>(null)
-const [roomTypes,setRoomTypes]=useState<TroomTypes[]|null>(shitSTATE)
-const [roomDetail,setRoomDetails]=useState<any>(PUPUstate)
+  }
+]
+function BookingChartScreen({navigation, route}: any) {
+  const [state,setState]=useState<any>(null)
+  const [roomDetails,setRoomDetails]=useState(null)
+  const [bookingGrid, setBookingGrid] = useState({});
+  const [dates, setDates] = useState(null);
+  const [dateVariable,setDateVariable]=useState(3)
+  const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
+  const cellWidth = windowHeight/5
+  const cellBorderColor ="lightgray"
+  const cellBackgroundColor= "white"
+  const defaultColor="#B185A7"
+  const cellColumnColor1="#E8DBC5"
+  const cellColumnColor2="#FFF4E9"
 
-const {currentDay,monthFullName,monthNumber} = route.params;
-const [monthState,setMonthState]=useState<number>(monthNumber)
-const [data,setData]=useState<any>([ 
-  { id: 1, room_number: '101', room_class: 'Standard' },
-{ id: 2, room_number: '102', room_class: 'Deluxe' },
-{ id: 3, room_number: '201', room_class: 'Standard' }]) //for populating room rows
+  const todayDate = useSelector(
+    (state: RootState) => state.currentISODate.value,
+  );
 
-const fullNames =["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
-const roomTypesToDisplay= roomTypes?"roomTypes":"ROOM TYPE"
-//console.log("FullMonth",fullNames[monthNumber])
+  console.log("state:",state)
+function organizeBookingsIntoGrid(bookings, rooms, startDate, endDate) {
+  // Create an object to store bookings grouped by room type and room number
+  const bookingGrid = {};
+  // Create an array of dates between the start and end date
+  const dates = [];
+  const currentDate = new Date(startDate);
+  while (currentDate <= endDate) {
+    dates.push(new Date(currentDate));
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  // Initialize the booking grid with empty arrays for each room type and room number
+  rooms.forEach(room => {
+    const roomType = room.room_class_id.class_name;
+    //console.log(roomType)
+    if (!bookingGrid[roomType]) {
+      bookingGrid[roomType] = {};
+      //console.log(bookingGrid[roomType])
+    }
+    bookingGrid[roomType][room.room_number] = [];
+    //console.log("as",bookingGrid[roomType][room.room_number])
+  });
 
-const currentDate = new Date(currentDay);
+  // Populate the booking grid with booking IDs
+  bookings.forEach(booking => {
+    const roomType = booking.booking_room.room_id.room_class_id.class_name;
+    const roomNumber = booking.booking_room.room_id.room_number;
+    const checkinDate = new Date(booking.checkin_date);
+    const checkoutDate = new Date(booking.checkout_date);
+    console.log(checkinDate,checkoutDate,endDate,startDate)
+    // Check if the booking falls within the date range
+    if (checkinDate <= endDate && checkoutDate >= startDate) {
+      // Iterate over dates and add the booking ID to the corresponding room and date
+      dates.forEach(date => {
+        if (date >= checkinDate && date <= checkoutDate) {
+          if (!bookingGrid[roomType][roomNumber]) {
+            //console.log(bookingGrid[roomType][roomNumber])
+            bookingGrid[roomType][roomNumber] = [];
+          }
+          bookingGrid[roomType][roomNumber].push(booking.id);
+          //console.log("działam")
+        }
+      });
+    }
+  });
+  // Return the booking grid and dates
+  console.log("bookingGrid:",JSON.stringify(bookingGrid))
+  console.log("DATES:",JSON.stringify(dates))
+  return { bookingGrid, dates };
+}
+// Call the function with the list of bookings, rooms, and date range
+
+//const { bookingGrid, dates } = organizeBookingsIntoGrid(BOOKING, ROOM, startDate, endDate);
+
+const handleStates=()=>{
+  //console.log("PIIPIPIP",startDate,endDate,earlier_date,later_date)
+  const { bookingGrid, dates } = organizeBookingsIntoGrid(BOOKING, ROOM, startDate, endDate);
+  setBookingGrid(bookingGrid);
+  const arrayOfDatesStrings = dates.map((item)=> item.toISOString())
+  setDates(arrayOfDatesStrings);
+  //console.log("setState:",bookingGrid);
+//console.log("setStateDates:",dates);
+//console.log(arrayOfDatesStrings.map((item)=> typeof item))
+}
+  const handleReachedEnd=()=>{
+    setDateVariable((dateVariable)=>dateVariable+3)
+    handleStates()
+  }
+  const currentDate = new Date();
+  console.log("currentDate:",currentDate)
   // Create a new Date object for 5 days later
   const futureDate = new Date(currentDate);
-  futureDate.setDate(currentDate.getDate() + 3);
+  futureDate.setDate(currentDate.getDate() + dateVariable);
   // Format the dates to ISO 8601 string format
-  const later_date = futureDate.toISOString();
-  const earlier_date = currentDate.toISOString();
-  console.log("later_date",later_date,"earlier_date",earlier_date)
+  const later_date = futureDate.toISOString().split("T")[0].concat("T00:00:00Z");// Dates for supabase
+  const earlier_date = currentDate.toISOString().split("T")[0].concat("T00:00:00Z");// Dates for supabase
+  const startDate = new Date(earlier_date); // Dates for organizeBookingsIntoGrid
+  const endDate = new Date(later_date); // Dates for organizeBookingsIntoGrid
 
+  //console.log("DZIEN:","startDate:",startDate,"endDate:",endDate,"futureDate:",futureDate,"later_date:",later_date,"early_date:",earlier_date)
   const fetchData = async () => {
     try {
       console.log('trying to fetch');
@@ -94,7 +172,7 @@ const currentDate = new Date(currentDay);
       // Fetch booking and room data simultaneously
       const [bookingResponse, roomResponse] = await Promise.all([
         supabase.from('booking')
-          .select('booking_room(room_id(*)),guest_id(first_name,last_name),booking_color')
+          .select('id,booking_room(room_id(*,room_class_id(*,id))),guest_id(first_name,last_name),booking_color,checkin_date,checkout_date')
           .filter('checkin_date', 'lte', later_date)
           .filter('checkout_date', 'gte', earlier_date),
         supabase.from('room')
@@ -125,275 +203,141 @@ const currentDate = new Date(currentDay);
       return error;
     }
   };
-  
-  const fetchData2 = async () => {
-    try {
-      console.log('trying to fetch');
-      let {data: room, error} = await supabase
-        .from('room_class') //fetching room types
-        .select(
-          'class_name',
-        )//'id,room_number,room_class_id(class_name),floor_id(floor_number)',
-      console.log('room_class', room);
-      console.info('stringify:', JSON.stringify(room, null, 2));
-      setRoomTypes(room);
-      if (error) {
-        console.error('Error fetching data:', error);
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      return error;
-    }
-  };
 
-//TODO fetch room type and ROOms for ROOM TYPE in room occupancy component
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
-const IconCalendar = <Icon name="edit-calendar" size={30} color="black" />;
-
-const date = new Date();
-//console.log("date:",date,windowHeight,windowWidth,monthName,dayName)
-/* const data:Tdata[]= [
-  { id: '1', text: "" },
-  { id: '2', text: 'Item 2' },
-  { id: '3', text: 'Item 3' },
-  // Add more data as needed
-]; */
-const nextThreeDays: string[] = []; // Change type to string[]
-const nextThreeDaysFull: string[] = []; // Change type to string[]
-
-for (let i = 0; i < 3; i++) {
-  const nextDate = new Date();
-  nextDate.setDate(date.getDate() + i);
-  nextThreeDays.push(nextDate.toDateString());
-  nextThreeDaysFull.push(nextDate.toISOString().split("T")[0].concat("T00:00:00Z"))
-  //console.log(nextDate.toISOString().split("T")[0].concat("T00:00:00Z"))
-} console.log(nextThreeDaysFull)
-const DayPanel = ({ date }: { date: string }) => {    
-    const dateSplited=date.split(" ")
-    const dayName=dateSplited[0]
-    const month = dateSplited[1]
-    const dayNumber = dateSplited[2]
-    //console.log(dateSplited)
+  const DayPanel = ({ date,index }: { date: any,index:number }) => {    
+    const dateString = date;
+  const toChange = new Date(dateString);
+  const dayName = toChange.toLocaleDateString('en-US', { weekday: 'short' });
+  const dayNumber = String(toChange.getDate());
+  const month =toChange.toLocaleDateString('en-US', { month: 'short' });
+    //console.log(dayNumber,month, dayName)
+    const columnRemainder=index%2===0
   return (
-    <View style={{ height: 80,flex:1,backgroundColor:"white",borderWidth: 1,borderColor:"lightgray"}}>
-      <Text>{dayName}</Text>
-      <Text>{month}</Text>
-      <Text>{dayNumber}</Text>
-    </View>
-  );
-}
-//        <Text h4>{displayMonthFullName}</Text>
-const MonthPanel=()=>{
-  const leftArrow = <Icon name="arrow-left" size={30} color="white" />;
-  const rightArrow = <Icon name="arrow-right" size={30} color="white" />;
-  const handleMonthChange=(direction:string)=>{
-    fullNames.length
-    console.log(monthState,fullNames.length)
-    if (direction === 'right') {
-      monthState===11?setMonthState((monthState)=>0):
-      setMonthState((monthState)=>monthState+1)
-  } else if (direction === 'left') {
-    monthState===0?setMonthState((monthState)=>11):
-    setMonthState((monthState)=>monthState-1)
-  }}
-
-  return(
-    <View style={{flexDirection:'row',alignItems:'center',justifyContent:"space-around",height:60}}>
-      <Button onPress={()=>handleMonthChange("left")} style={{height:40,width:40,backgroundColor:"red"}} title={"chuj"}>{leftArrow}</Button>
-      <Text h4 >{fullNames[monthState]}</Text>
-      <Button onPress={()=>handleMonthChange("right")} style={{height:40,width:40,backgroundColor:"red"}} title={"chuj"}>{rightArrow}</Button>
-    </View>
-  ) 
-
-}
-
-const TopPanel = () => {
-  const DaysToRender = nextThreeDays.map((date, index) => {
-    return <DayPanel date={date} key={date+index}/>
-  });
-  //TODO make a calendar Button
-  return (
-    <View >
-    <View style={{ height: 80, backgroundColor: "red", width: windowWidth, flexDirection: 'row' }}>
-    <TouchableOpacity style={{width:windowWidth/6,justifyContent:"center",alignItems:"center",}} activeOpacity={0.2} onPress={()=>console.log("press Calendar")}>
-        {IconCalendar} 
-    </TouchableOpacity>
-      {DaysToRender}
-      </View>
-    </View>
-  );
-}
-
-type Tdata={
-    id: string;
-    text: string;
-}
-
-
-/* function hasMatchingRooms(){ let data = BOOKING  
-  const bookingRoomIds= data.map(data=>data.booking_room.room_id.id) 
-  console.log(bookingRoomIds)
-  const hasMatchingRoom = ROOM.filter(ROOM => bookingRoomIds.includes(ROOM.id));
-  console.log(hasMatchingRoom)
-  const matchingBookings = BOOKING.filter(booking => bookingRoomIds.includes(booking.booking_room.room_id.id));
-  console.log(matchingBookings);
-} */
-
-  const RoomItem = ({ item }: { item: any }) => {
-    //console.log("ROOM ITEM:",item)
-
-    return(
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', height: 80,backgroundColor:"white",borderWidth: 1,borderColor:"lightgray",width:windowWidth/3 }}>
-      <Text>"sa"</Text>
-    </View>
-  )};
-const RoomsOccupancyList=()=>{
-    return(
-        //here flatlist to do more nesting
-        <View style={{backgroundColor:"red", width:windowWidth,flexDirection:"row"}}>
-        <View style={{backgroundColor:"lightblue",width:windowWidth/6,height:80,justifyContent:'center',alignItems:"center"}}>
-            <Text>{roomTypesToDisplay}</Text>
-        </View>
-        <FlatList
-        //horizontal={true}
-        data={data.slice(0,3)}// TODO change that //state
-        keyExtractor={(item, index:number) => `${index}`}
-        renderItem={RoomItem}
-        numColumns={3}
-        //getItemLayout
-      />
-      </View>
-    )
-}
-//TODO consider if I really need FLATLISTS xD? 
-const RoomsOccupancyList2 = () => {
-  // Assuming roomTypesToDisplay is an array of room types
-  const RenderRoomType = ({ item }:{item:TRoomDetails}) => {
-    //console.log(item)
-    return(
-      <View style={{ backgroundColor: "red", width: windowWidth, flexDirection: "row" }}>
-          <View style={{ backgroundColor: "lightblue", width: windowWidth / 6, height: 80, justifyContent: 'center', alignItems: "center" }}>
-              <Text>{item.room_class_id.class_name}</Text>
-              <Text>{item.room_number}</Text>
-              <Text>{item.floor_id.floor_number}</Text>
-          </View>
-          <FlatList
-            horizontal
-              data={data.slice(0, 3)} // Assuming data contains occupancy data for each room type
-              keyExtractor={(item, index) => `${item}-${index}`}
-              renderItem={RoomItem}
-          />
-      </View>
-  )}
-
-  return (
-   < View>
-    <TopPanel2/>
-      <FlatList
-          data={roomDetail}
-          keyExtractor={(item, index) => `${index}`}
-          renderItem={RenderRoomType}
-          
-      />
+    <View style={{width:cellWidth,backgroundColor:columnRemainder?cellColumnColor1:cellColumnColor2,borderWidth: 1,borderColor:cellBorderColor,paddingLeft:10 }}>
+        <Text h4>{dayName}</Text>
+        <Text h4>{dayNumber}</Text>
+        <Text h4>{month}</Text>
       </View>
   );
-}
-const TopPanel2 = () => {
-  const DayPanel = ({ date }: { date: string }) => {    
-    const dateSplited = date.split(" ");
-    const dayName = dateSplited[0];
-    const month = dateSplited[1];
-    const dayNumber = dateSplited[2];
-  
-    return (
-      <View style={{width:windowWidth/3, height: 80, flex: 1, backgroundColor: "white", borderWidth: 1, borderColor: "lightgray" }}>
-        <Text>{dayName}</Text>
-        <Text>{month}</Text>
-        <Text>{dayNumber}</Text>
-      </View>
-    );
   }
-
-  const renderItem = ({ item }: { item: string }) => <DayPanel date={item} />;
-
-  return (
-    <View>
-      <View style={{ height: 80, backgroundColor: "red", width: windowWidth, flexDirection: 'row' }}>
-        <TouchableOpacity style={{ width: windowWidth / 6, justifyContent: "center", alignItems: "center" }} activeOpacity={0.2} onPress={() => console.log("press Calendar")}>
-          {IconCalendar} 
-        </TouchableOpacity>
-        <FlatList
-        horizontal
-          data={nextThreeDays}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-        />
+  const IconCalendar = <Icon name="edit-calendar" size={30} color="black" />
+  const TOPITEM=()=>{
+    return(
+      <View style={{ flexDirection: 'row', flex: 1 }}>
+      <View style={{width:80,height:100}}>
+      <TouchableOpacity style={{width:80,justifyContent:"center",alignItems:"center", flex: 1,backgroundColor:"#8D6B94",borderWidth: 1 }} activeOpacity={0.2} onPress={()=>console.log("press Calendar")}>
+      {IconCalendar} 
+      </TouchableOpacity>
       </View>
-    </View>
-  );
-}
-
-
-return (
-  <View style={{ flex: 1, backgroundColor: "pink" }}>
-    <MonthPanel/>
-    <TopPanel/>
-    <RoomsOccupancyList/>
-    <Text>BookingChartScreen SEPARATOR</Text>
-    <Button title={"fetch data bookings"} onPress={()=>fetchData()}/>
-    <Button title={"fetch data rooms"} onPress={()=>fetchData2()}/>
-{/*     <Button title={"shit"} onPress={()=>shit()}/>h*/}
-    <RoomsOccupancyList2/>
-  </View>
-);
-}
-export default BookingChartScreen
-//TODO Unify styles
-let mockupFETCh=  [
-    {
-      "id": "4fac5959-62c8-41a8-855a-e149e4fc6c76",
-      "room_number": "2",
-      "room_class_id": {
-        "class_name": "Deluxe"
-      },
-      "floor_id": {
-        "floor_number": "1st Floor"
+      <FlatList
+        style={{flex:1}}
+        data={dates} //tutaj daty
+        renderItem={({ item,index }) => <DayPanel date={item} index={index}/>}
+        keyExtractor={(item, index) => index.toString()}
+        horizontal
+        onEndReached={()=>{console.log("END REACHED"),handleReachedEnd()}}
+      /></View>
+    )}
+    // Render each cell in the FlatList
+    const RenderItem = ({ item ,index }) => {
+      console.log("renderITEM-INDEX:",item)
+      const columnRemainder=index%2===0
+      if (!item.trim()) {
+        return (
+          <View style={{ width: cellWidth, borderWidth: 1,borderColor:cellBorderColor,backgroundColor:columnRemainder?cellColumnColor1:cellColumnColor2,justifyContent:"center",alignItems:"center"
+           }}>
+            <Text>EMPTY</Text>
+          </View>
+        );
       }
-    },
-    {
-      "id": "0fad24a2-035e-4d12-9964-9ba84b4373c2",
-      "room_number": "1",
-      "room_class_id": {
-        "class_name": "Standard"
-      },
-      "floor_id": {
-        "floor_number": "2nd Floor"
+    
+      if (!state) {
+        return  (<View style={{ width: cellWidth, borderWidth: 1,borderColor:cellBorderColor,justifyContent:"center",alignItems:"center",backgroundColor:columnRemainder?cellColumnColor1:cellColumnColor2 }}>
+        <Text>NO STATE</Text>
+      </View>); // or handle the case when state is not available
       }
-    },
-    {
-      "id": "b79b8ae7-e19a-4485-8f03-4215b943aca6",
-      "room_number": "3",
-      "room_class_id": {
-        "class_name": "Suite"
-      },
-      "floor_id": {
-        "floor_number": "3rd Floor"
+    
+      const getObjectById = (id) => {
+        return state.find((obj) => obj.id === id);
+      };
+    
+      const foundObject = getObjectById(item);
+      if (foundObject) {
+        const cellColor = foundObject.booking_color;
+        const cellFirstName =foundObject.guest_id.first_name
+        const cellLastName =foundObject.guest_id.last_name
+        const objCheckIn=foundObject.checkin_date.split("T")[0]
+        const objCheckOut=foundObject.checkout_date.split("T")[0]
+        const checkInStyle=objCheckIn===dates[index].split("T")[0]
+        const checkOutStyle=objCheckOut===dates[index].split("T")[0]
+        //console.log("foundObject:",objCheckIn,objCheckOut,checkInStyle,checkOutStyle,dates[index])
+        return (
+          <View style={{ width: cellWidth, borderWidth: 1, paddingTop:5,paddingLeft: checkInStyle?5:0,  paddingBottom:5, paddingRight:checkOutStyle?5:0,borderColor:cellBorderColor,borderRightWidth:checkOutStyle?1:0,borderLeftWidth:checkInStyle?1:0, backgroundColor:columnRemainder?cellColumnColor1:cellColumnColor2}}>
+            <View style={{backgroundColor:cellColor?cellColor:"yellow",borderTopRightRadius:checkOutStyle? 20:0,borderBottomLeftRadius:checkInStyle? 20:0,borderTopLeftRadius:checkInStyle?5:0, flex:1,borderBottomRightRadius:checkOutStyle?5:0,paddingLeft:15}}>
+              {index===0?<><Text>{cellFirstName}</Text><Text>{cellLastName}</Text></>:null}
+            </View>
+          </View>
+        );//maybe add what kind of bed they sleep on?
+      } else {
+        return (
+          <View style={{ width: cellWidth, borderWidth: 1,borderColor:cellBorderColor,justifyContent:"center",alignItems:"center",backgroundColor:columnRemainder?cellColumnColor1:cellColumnColor2 }}>
+            <Text>NOT FOUND</Text>
+          </View>
+        );
       }
-    }
-  ]
-
-/*   <View style={{backgroundColor:"red", width:windowWidth,flexDirection:"row"}}>
-        <View style={{backgroundColor:"lightblue",width:windowWidth/6,height:80,justifyContent:'center',alignItems:"center"}}>
-            <Text>roomTypes state</Text>
-        </View>
-        <FlatList
-        //horizontal={true}
-        data={data.slice(0,3)}// TODO change that
-        keyExtractor={(item, index:number) => item.id}
-        renderItem={RoomItem}
-        numColumns={3}
-        //getItemLayout
+    };
+    
+const RENDERROW=({ item })=>{
+  const roomTypeName= item[0]
+  const roomNumber= Object.keys(item[1])[0];
+  const emptyArray = Array.from({ length: dates.length }, (_, index) => "");
+  //console.log(dates)  //TODO DO SPRAWDZENIA CAŁY SYSTEM ROBIENIA ARRAY
+  let shit = item[1][1]===undefined?undefined:item[1][1].length
+  let shit2 = item[1][1]!==undefined?item[1][1].concat(Array.from({ length:item[1][1].length }, (_, index) => " ")):undefined
+  
+  const renderSingleCellData=item[1][1]===undefined?emptyArray:shit2
+  console.log("renderROW;", item[1][1],emptyArray.length,shit,shit2)
+  return(
+    <View style={{ flexDirection: 'row', flex: 1,height:100, }}>
+      <View style={{height:100,width:80,justifyContent:"center",alignItems:'center',backgroundColor:defaultColor,borderWidth: 1}}>
+      <Text >{roomTypeName}</Text>
+      <Text >{roomNumber}</Text>
+      </View>
+    <FlatList
+      data={renderSingleCellData}//['ASD','BSD','CSD']
+      renderItem={RenderItem}
+      keyExtractor={(item, index) => index.toString()}
+      horizontal={true}
+      extraData={bookingGrid}
       />
-        </View> */
-        
+  </View>
+  )
+}
+console.log("bookingGrid:",Object.entries(bookingGrid))
+  return (
+    <View style={{flex:1}}>
+    <Button title={"fetch data bookings"} onPress={()=>fetchData()}/>
+    <Button title={"handleStates()"} onPress={()=>handleStates()}/>
+    <Button title={"mapBookingsToRows"} onPress={()=> organizeBookingsIntoGrid(BOOKING, ROOM, earlier_date, later_date)}/>
+       <FlatList
+       style={{flex:1}}
+       data={Object.entries(bookingGrid)} //tutaj rodzaje Object.entries(bookingGrid)
+       renderItem={RENDERROW}
+       ListHeaderComponent={TOPITEM}
+       extraData={dateVariable}
+        /> 
+    </View>
+  )
+}
+
+export default BookingChartScreen
+
+/*   const horizontalFlatListRef = useRef();
+  const handleScroll = (event) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    console.log('Current scroll offset:', offsetX);
+    // Scroll other horizontal FlatLists
+    if (horizontalFlatListRef.current) {
+      horizontalFlatListRef.current.scrollToOffset({ offset: offsetX, animated: false });
+    }
+  }; */
