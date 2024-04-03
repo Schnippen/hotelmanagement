@@ -176,7 +176,7 @@ const DayPanel = ({ date }: { date: string }) => {
     const dayNumber = dateSplited[2]
     //console.log(dateSplited)
   return (
-    <View style={{ height: 80,flex:1,backgroundColor:"white",borderWidth: 1,borderColor:"lightgray" }}>
+    <View style={{ height: 80,flex:1,backgroundColor:"white",borderWidth: 1,borderColor:"lightgray"}}>
       <Text>{dayName}</Text>
       <Text>{month}</Text>
       <Text>{dayNumber}</Text>
