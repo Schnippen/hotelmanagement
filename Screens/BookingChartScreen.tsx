@@ -1,6 +1,6 @@
 import { Button, Icon, Text } from '@rneui/themed'
-import React, { useState } from 'react'
-import { Dimensions, FlatList, Touchable, TouchableOpacity, View } from 'react-native'
+import React, { useRef, useState } from 'react'
+import { Dimensions, FlatList, ScrollView, Touchable, TouchableOpacity, View } from 'react-native'
 import { supabase } from '../Supabase/supabase';
 import { useSelector } from 'react-redux';
 import { RootState } from '../Store/store';
@@ -221,6 +221,16 @@ const handleStates=()=>{
   );
   }
   const IconCalendar = <Icon name="edit-calendar" size={30} color="black" />
+  const horizontalFlatListRef = useRef();
+
+const handleScroll = (event) => {
+  const offsetX = event.nativeEvent.contentOffset.x;
+  //console.log('Current scroll offset:', offsetX);
+  // Scroll other horizontal FlatLists
+  if (horizontalFlatListRef.current) {
+    horizontalFlatListRef.current.scrollToOffset({ offset: offsetX, animated: false });
+  }
+};
   const TOPITEM=()=>{
     return(
       <View style={{ flexDirection: 'row', flex: 1 }}>
@@ -235,7 +245,8 @@ const handleStates=()=>{
         renderItem={({ item,index }) => <DayPanel date={item} index={index}/>}
         keyExtractor={(item, index) => index.toString()}
         horizontal
-        onEndReached={()=>{console.log("END REACHED"),handleReachedEnd()}}
+        onScroll={handleScroll}
+        //onEndReached={()=>{console.log("END REACHED"),handleReachedEnd()}}
       /></View>
     )}
     // Render each cell in the FlatList
@@ -287,7 +298,7 @@ const handleStates=()=>{
       }
     };
     
-const RENDERROW=({ item })=>{
+/* const RENDERROW=({ item })=>{
   const roomTypeName= item[0]
   const roomNumber= Object.keys(item[1])[0];
   const emptyArray = Array.from({ length: dates.length }, (_, index) => "");
@@ -312,7 +323,71 @@ const RENDERROW=({ item })=>{
       />
   </View>
   )
+} */
+
+const RENDERROW=({ item })=>{
+  const PEPE = Object.entries(item);
+  
+  // Map over each entry in item to extract room type, room number, and bookings
+  const ROOMS = PEPE.map(([roomType, roomObject]) => {
+    // Extract room numbers and their corresponding bookings
+    const roomNumber = Object.keys(roomObject);
+    const bookings = roomNumber.map(number => roomObject[number]).flat(); // Flatten the bookings array
+    console.log("Room Type:", roomType);
+    console.log("Room Numbers:", roomNumber[0]);
+    console.log("Bookings:", bookings);
+    return { roomType, roomNumber, bookings };
+  });
+
+  // Flatten the rows data
+  const rowData = ROOMS.map(i => {
+    const emptyArray = Array.from({ length: dates.length }, (_, index) => " ");
+    const ROW = i.bookings;
+    let shit2 = ROW.concat(Array.from({ length: ROW.length }, (_, index) => " ")) ;
+    console.log("ROW:", ROW, shit2,typeof ROW);
+    const renderSingleCellData = ROW.some(item => item !== " ")? shit2 : emptyArray;
+    console.log("renderROW;", ROW, emptyArray.length, shit2);
+    return { roomType: i.roomType, roomNumber: i.roomNumber[0], data: renderSingleCellData };
+  }).flat();
+
+  return (
+    <View style={{backgroundColor:"gray",flexDirection:"row",flex:1}}>
+      <FlatList
+            data={rowData}
+            renderItem={({ item, index }) => ( 
+            <View style={{ flexDirection: 'column', height:100,width:80,justifyContent:"center",alignItems:'center',backgroundColor:defaultColor,borderWidth: 1}}>
+            <Text>{item.roomType}</Text>
+            <Text>{item.roomNumber}</Text>
+          </View>   )}
+      />    
+      <FlatList data={[0]} 
+        ref={horizontalFlatListRef}
+        horizontal 
+      style={{backgroundColor:"orange",flex:1}}
+       renderItem={()=>( 
+       <FlatList
+      style={{backgroundColor:"yellow" }}
+      data={rowData}
+      renderItem={({ item, index }) => (
+            <View style={{ flexDirection: 'row', flexWrap: 'nowrap',height:100 }}>
+              {item.data.map((dataItem, dataIndex) => (
+                <RenderItem key={dataIndex} item={dataItem} index={dataIndex} />
+              ))}
+        </View>
+      )}
+      keyExtractor={(item, index) => index.toString()}
+    />)}/>
+     
+    </View>
+  );
 }
+{/*   <FlatList
+    data={renderSingleCellData}//['ASD','BSD','CSD']
+    renderItem={RenderItem}
+    keyExtractor={(item, index) => index.toString()}
+    horizontal={true}
+    extraData={bookingGrid}
+    /> */}
 console.log("bookingGrid:",Object.entries(bookingGrid))
   return (
     <View style={{flex:1}}>
@@ -321,9 +396,9 @@ console.log("bookingGrid:",Object.entries(bookingGrid))
     <Button title={"mapBookingsToRows"} onPress={()=> organizeBookingsIntoGrid(BOOKING, ROOM, earlier_date, later_date)}/>
        <FlatList
        style={{flex:1}}
-       data={Object.entries(bookingGrid)} //tutaj rodzaje Object.entries(bookingGrid)
+       data={[bookingGrid]} //tutaj rodzaje Object.entries(bookingGrid)
        renderItem={RENDERROW}
-       ListHeaderComponent={TOPITEM}
+       ListHeaderComponent={TOPITEM} //this is OK
        extraData={dateVariable}
         /> 
     </View>
