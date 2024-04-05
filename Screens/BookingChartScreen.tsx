@@ -1,5 +1,5 @@
 import { Button, Icon, Text } from '@rneui/themed'
-import React, { useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { Dimensions, FlatList, ScrollView, Touchable, TouchableOpacity, View } from 'react-native'
 import { supabase } from '../Supabase/supabase';
 import { useSelector } from 'react-redux';
@@ -71,7 +71,7 @@ function BookingChartScreen({navigation, route}: any) {
   const [roomDetails,setRoomDetails]=useState(null)
   const [bookingGrid, setBookingGrid] = useState({});
   const [dates, setDates] = useState(null);
-  const [dateVariable,setDateVariable]=useState(3)
+  const [dateVariable,setDateVariable]=useState(4)
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   const cellWidth = windowHeight/5
@@ -87,9 +87,7 @@ function BookingChartScreen({navigation, route}: any) {
 
   console.log("state:",state)
 function organizeBookingsIntoGrid(bookings, rooms, startDate, endDate) {
-  // Create an object to store bookings grouped by room type and room number
   const bookingGrid = {};
-  // Create an array of dates between the start and end date
   const dates = [];
   const currentDate = new Date(startDate);
   while (currentDate <= endDate) {
@@ -152,6 +150,11 @@ const handleStates=()=>{
   const handleReachedEnd=()=>{
     setDateVariable((dateVariable)=>dateVariable+3)
     handleStates()
+    const lastIndex = dates.length - 1;
+        const targetIndex = lastIndex > 0 ? lastIndex - 1 : 0;
+
+        // Scroll to the item before the last one
+        scrollIndex.current.scrollToIndex({ index: targetIndex, animated: true });
   }
   const currentDate = new Date();
   console.log("currentDate:",currentDate)
@@ -222,6 +225,7 @@ const handleStates=()=>{
   }
   const IconCalendar = <Icon name="edit-calendar" size={30} color="black" />
   const horizontalFlatListRef = useRef();
+  const scrollIndex = useRef(null);
 
 const handleScroll = (event) => {
   const offsetX = event.nativeEvent.contentOffset.x;
@@ -245,13 +249,65 @@ const handleScroll = (event) => {
         renderItem={({ item,index }) => <DayPanel date={item} index={index}/>}
         keyExtractor={(item, index) => index.toString()}
         horizontal
+        ref={scrollIndex}
         onScroll={handleScroll}
+/*         onEndReached={({ distanceFromEnd }) => {
+          console.log('on end reached ', distanceFromEnd,handleReachedEnd())
+        }} */
         //onEndReached={()=>{console.log("END REACHED"),handleReachedEnd()}}
       /></View>
     )}
-    // Render each cell in the FlatList
-    const RenderItem = ({ item ,index }) => {
-      console.log("renderITEM-INDEX:",item)
+    // TRYING TO OPTIMIZE FLATLIST wih callback :) ? 
+    const RenderItem = useCallback(({ item, index }) => {
+      const columnRemainder = index % 2 === 0;
+  
+      if (!item.trim()) {
+          return (
+              <View style={{ width: cellWidth, borderWidth: 1, borderColor: cellBorderColor, backgroundColor: columnRemainder ? cellColumnColor1 : cellColumnColor2, justifyContent: "center", alignItems: "center" }}>
+                  <Text>EMPTY</Text>
+              </View>
+          );
+      }
+  
+      if (!state) {
+          return (
+              <View style={{ width: cellWidth, borderWidth: 1, borderColor: cellBorderColor, justifyContent: "center", alignItems: "center", backgroundColor: columnRemainder ? cellColumnColor1 : cellColumnColor2 }}>
+                  <Text>NO STATE</Text>
+              </View>
+          );
+      }
+  
+      const getObjectById = (id) => {
+          return state.find((obj) => obj.id === id);
+      };
+  
+      const foundObject = getObjectById(item);
+      if (foundObject) {
+          const cellColor = foundObject.booking_color;
+          const cellFirstName = foundObject.guest_id.first_name;
+          const cellLastName = foundObject.guest_id.last_name;
+          const objCheckIn = foundObject.checkin_date.split("T")[0];
+          const objCheckOut = foundObject.checkout_date.split("T")[0];
+          const checkInStyle = objCheckIn === dates[index].split("T")[0];
+          const checkOutStyle = objCheckOut === dates[index].split("T")[0];
+  
+          return (
+              <View style={{ width: cellWidth, borderWidth: 1, paddingTop: 5, paddingLeft: checkInStyle ? 5 : 0, paddingBottom: 5, paddingRight: checkOutStyle ? 5 : 0, borderColor: cellBorderColor, borderRightWidth: checkOutStyle ? 1 : 0, borderLeftWidth: checkInStyle ? 1 : 0, backgroundColor: columnRemainder ? cellColumnColor1 : cellColumnColor2 }}>
+                  <View style={{ backgroundColor: cellColor ? cellColor : "yellow", borderTopRightRadius: checkOutStyle ? 20 : 0, borderBottomLeftRadius: checkInStyle ? 20 : 0, borderTopLeftRadius: checkInStyle ? 5 : 0, flex: 1, borderBottomRightRadius: checkOutStyle ? 5 : 0, paddingLeft: 15 }}>
+                      {index === 0 ? <><Text>{cellFirstName}</Text><Text>{cellLastName}</Text></> : null}
+                  </View>
+              </View>
+          );
+      } else {
+          return (
+              <View style={{ width: cellWidth, borderWidth: 1, borderColor: cellBorderColor, justifyContent: "center", alignItems: "center", backgroundColor: columnRemainder ? cellColumnColor1 : cellColumnColor2 }}>
+                  <Text>NOT FOUND</Text>
+              </View>
+          );
+      }
+  }, [bookingGrid]);
+/*     const RenderItem = ({ item ,index }) => {
+      //console.log("renderITEM-INDEX:",item)
       const columnRemainder=index%2===0
       if (!item.trim()) {
         return (
@@ -296,7 +352,7 @@ const handleScroll = (event) => {
           </View>
         );
       }
-    };
+    }; */
     
 /* const RENDERROW=({ item })=>{
   const roomTypeName= item[0]
@@ -327,7 +383,6 @@ const handleScroll = (event) => {
 
 const RENDERROW=({ item })=>{
   const PEPE = Object.entries(item);
-  
   // Map over each entry in item to extract room type, room number, and bookings
   const ROOMS = PEPE.map(([roomType, roomObject]) => {
     // Extract room numbers and their corresponding bookings
@@ -343,10 +398,10 @@ const RENDERROW=({ item })=>{
   const rowData = ROOMS.map(i => {
     const emptyArray = Array.from({ length: dates.length }, (_, index) => " ");
     const ROW = i.bookings;
-    let shit2 = ROW.concat(Array.from({ length: ROW.length }, (_, index) => " ")) ;
-    console.log("ROW:", ROW, shit2,typeof ROW);
-    const renderSingleCellData = ROW.some(item => item !== " ")? shit2 : emptyArray;
-    console.log("renderROW;", ROW, emptyArray.length, shit2);
+    let filledROW = ROW.concat(Array.from({ length: dates.length-ROW.length }, (_, index) => " ")) ;
+    console.log("ROW:", ROW,"filledROW:",typeof ROW,ROW.length,filledROW.length,dates.length);
+    const renderSingleCellData = ROW.some(item => item !== " ")? filledROW : emptyArray;
+    console.log("renderROW;", ROW, emptyArray.length, filledROW);
     return { roomType: i.roomType, roomNumber: i.roomNumber[0], data: renderSingleCellData };
   }).flat();
 
@@ -377,7 +432,6 @@ const RENDERROW=({ item })=>{
       )}
       keyExtractor={(item, index) => index.toString()}
     />)}/>
-     
     </View>
   );
 }
