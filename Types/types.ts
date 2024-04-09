@@ -104,3 +104,52 @@ export interface TRoomDetailsComponentFull {
     }[];
   };
 }
+
+//BookingChartScreen
+export interface TBookingRoom {
+  room_id: {
+    id: string;
+    floor_id: number;
+    status_id: number;
+    room_number: string;
+    room_class_id: {
+      id: number;
+      base_price: number;
+      class_name: string;
+    };
+  };
+}
+
+export interface Guest {
+  last_name: string;
+  first_name: string;
+}
+
+export interface TBookingChart {
+  id: string;
+  booking_color: string;
+  checkin_date: string;
+  checkout_date: string;
+  booking_room: TBookingRoom;
+  guest_id: Guest;
+}
+export interface TRoomFetch {
+  id: string;
+  room_number: string;
+  room_class_id: {
+    class_name: string;
+  };
+  floor_id: {
+    floor_number: string;
+  };
+}
+export type TBookingObject = {day: string; bookingID: string | null} | string[];
+
+export interface TRoomBookings {
+  [roomNumber: string]: TBookingObject[];
+}
+
+export type TBookingGrid<T extends string> = {
+  [K in T]: TRoomBookings;
+};
+type TDateStrings = string[];

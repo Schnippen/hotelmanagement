@@ -14,6 +14,13 @@ import {
 import {supabase} from '../Supabase/supabase';
 import {useSelector} from 'react-redux';
 import {RootState} from '../Store/store';
+import {
+  TBookingChart,
+  TBookingGrid,
+  TBookingObject,
+  TRoomFetch,
+} from '../Types/types';
+import {useQuery} from '@tanstack/react-query';
 /* const IconCalendar = <Icon name="edit-calendar" size={30} color="black" />;
 <TouchableOpacity style={{width:windowWidth/6,justifyContent:"center",alignItems:"center",}} activeOpacity={0.2} onPress={()=>console.log("press Calendar")}>
 {IconCalendar} 
@@ -75,11 +82,65 @@ let ROOM = [
     },
   },
 ];
+type TDateStrings = string[];
+
 function BookingChartScreen({navigation, route}: any) {
-  const [state, setState] = useState<any>(null);
-  const [roomDetails, setRoomDetails] = useState(null);
-  const [bookingGrid, setBookingGrid] = useState({});
-  const [dates, setDates] = useState(null);
+  const fetchBookingsAndRooms = async () => {
+    try {
+      console.log('trying to fetch');
+
+      // Fetch booking and room data simultaneously
+      const [bookingResponse, roomResponse] = await Promise.all([
+        supabase
+          .from('booking')
+          .select(
+            'id,booking_room(room_id(*,room_class_id(*,id))),guest_id(first_name,last_name),booking_color,checkin_date,checkout_date',
+          )
+          .filter('checkin_date', 'lte', later_date)
+          .filter('checkout_date', 'gte', earlier_date),
+        supabase
+          .from('room')
+          .select(
+            'id,room_number,room_class_id(class_name),floor_id(floor_number)',
+          ),
+      ]);
+
+      const {data: booking, error: bookingError} = bookingResponse;
+      const {data: room, error: roomError} = roomResponse;
+
+      //console.log('booking', booking);
+      //console.log('room', room);
+
+      //console.info('stringify booking:', JSON.stringify(booking, null, 2));
+      //console.info('stringify room:', JSON.stringify(room, null, 2));
+
+      setState(booking);
+      setRoomDetails(room);
+
+      // Handle errors from both requests
+      if (bookingError) {
+        console.error('Error fetching booking data:', bookingError);
+        setState([]);
+      }
+      if (roomError) {
+        console.error('Error fetching room data:', roomError);
+        setRoomDetails([]);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      return error;
+    }
+  };
+
+  const {data, isLoading, error, isSuccess} = useQuery({
+    queryKey: ['BookingChart'],
+    queryFn: fetchBookingsAndRooms,
+  });
+
+  const [state, setState] = useState<TBookingChart[] | null>(null);
+  const [roomDetails, setRoomDetails] = useState<TRoomFetch[] | null>(null);
+  const [bookingGrid, setBookingGrid] = useState<TBookingGrid<string>>({});
+  const [dates, setDates] = useState<TDateStrings>([]);
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   const cellWidth = windowHeight / 5;
@@ -88,23 +149,29 @@ function BookingChartScreen({navigation, route}: any) {
   const defaultColor = '#B185A7';
   const cellColumnColor1 = '#E8DBC5';
   const cellColumnColor2 = '#FFF4E9';
-
+  console.log('DATES STATE:', dates);
   const todayDate = useSelector(
     (state: RootState) => state.currentISODate.value,
   );
 
-  function organizeBookingsIntoGrid(bookings, rooms, startDate, endDate) {
-    const bookingGrid = {};
-    const dates = [];
+  function organizeBookingsIntoGrid(
+    bookings: TBookingChart[],
+    rooms: TRoomFetch[],
+    startDate: Date,
+    endDate: Date,
+  ) {
+    const bookingGrid: TBookingGrid<string> = {};
+    const dates: Array<Date> = [];
     const currentDate = new Date(startDate);
-
     // Iterate through each day within the date range
     while (currentDate <= endDate) {
       // Add the current date to the array of dates
       dates.push(new Date(currentDate));
       currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
     }
-
+    if (!bookings || !rooms) {
+      throw new Error('Bookings or rooms are null');
+    }
     // Initialize the booking grid with empty arrays for each room type and room number
     rooms.forEach(room => {
       const roomType = room.room_class_id.class_name;
@@ -186,20 +253,20 @@ function BookingChartScreen({navigation, route}: any) {
   };
   const handleMinusWeek = () => {
     const prevWeek = new Date(futureDate);
-    prevWeek.setDate(futureDate.getDate() - 7); // Decrease futureDate by 7 days
+    prevWeek.setDate(futureDate.getDate() - 7);
     setFutureDate(prevWeek);
     setCurrentDate(new Date(currentDate.setDate(currentDate.getDate() - 7)));
   };
-  const later_date = futureDate
+  const later_date: string = futureDate
     .toISOString()
     .split('T')[0]
     .concat('T00:00:00Z'); // Dates for supabase
-  const earlier_date = currentDate
+  const earlier_date: string = currentDate
     .toISOString()
     .split('T')[0]
     .concat('T00:00:00Z'); // Dates for supabase
-  const startDate = new Date(earlier_date); // Dates for organizeBookingsIntoGrid
-  const endDate = new Date(later_date); // Dates for organizeBookingsIntoGrid
+  const startDate: Date = new Date(earlier_date); // Dates for organizeBookingsIntoGrid
+  const endDate: Date = new Date(later_date); // Dates for organizeBookingsIntoGrid
   /*  console.log(
     'DZIEN:',
     'startDate:',
@@ -213,50 +280,6 @@ function BookingChartScreen({navigation, route}: any) {
     'early_date:',
     earlier_date,
   ); */
-  const fetchData = async () => {
-    try {
-      console.log('trying to fetch');
-
-      // Fetch booking and room data simultaneously
-      const [bookingResponse, roomResponse] = await Promise.all([
-        supabase
-          .from('booking')
-          .select(
-            'id,booking_room(room_id(*,room_class_id(*,id))),guest_id(first_name,last_name),booking_color,checkin_date,checkout_date',
-          )
-          .filter('checkin_date', 'lte', later_date)
-          .filter('checkout_date', 'gte', earlier_date),
-        supabase
-          .from('room')
-          .select(
-            'id,room_number,room_class_id(class_name),floor_id(floor_number)',
-          ),
-      ]);
-
-      const {data: booking, error: bookingError} = bookingResponse;
-      const {data: room, error: roomError} = roomResponse;
-
-      console.log('booking', booking);
-      console.log('room', room);
-
-      console.info('stringify booking:', JSON.stringify(booking, null, 2));
-      //console.info('stringify room:', JSON.stringify(room, null, 2));
-
-      setState(booking);
-      setRoomDetails(room);
-
-      // Handle errors from both requests
-      if (bookingError) {
-        console.error('Error fetching booking data:', bookingError);
-      }
-      if (roomError) {
-        console.error('Error fetching room data:', roomError);
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      return error;
-    }
-  };
 
   const DayPanel = ({date, index}: {date: any; index: number}) => {
     const dateString = date;
@@ -284,10 +307,12 @@ function BookingChartScreen({navigation, route}: any) {
     );
   };
   const IconCalendar = <Icon name="edit-calendar" size={30} color="black" />;
-  const horizontalFlatListRef = useRef();
+  const horizontalFlatListRef = useRef<FlatList<number>>(null);
   const scrollIndex = useRef(null);
 
-  const handleScrollHorizontal = event => {
+  const handleScrollHorizontal = (
+    event: NativeSyntheticEvent<NativeScrollEvent>,
+  ) => {
     const offsetX = event.nativeEvent.contentOffset.x;
     //console.log('Current scroll offset:', offsetX);
     if (horizontalFlatListRef.current) {
@@ -369,7 +394,7 @@ function BookingChartScreen({navigation, route}: any) {
   };
   // TRYING TO OPTIMIZE FLATLIST wih callback :) ?
   const RenderItem = useCallback(
-    ({item, index}) => {
+    ({item, index}: {item: TBookingObject; index: number}) => {
       const columnRemainder = index % 2 === 0;
 
       if (!item) {
@@ -408,7 +433,7 @@ function BookingChartScreen({navigation, route}: any) {
         );
       }
 
-      const getObjectById = id => {
+      const getObjectById = (id: TBookingObject) => {
         return state.find(obj => obj.id === id.bookingID);
       };
 
@@ -479,10 +504,10 @@ function BookingChartScreen({navigation, route}: any) {
     [bookingGrid],
   );
 
-  const RENDERROW = ({item}) => {
-    //console.log('RENDERROW ITEM:', item);
+  const RENDERROW = ({item}: {item: TBookingGrid<string>}) => {
+    // console.log('RENDERROW ITEM:', item);
     const PEPE = Object.entries(item);
-    console.log('PEPE:', PEPE);
+    //console.log('PEPE:', PEPE);
     // Map over each entry in item to extract room type, room number, and bookings
     const ROOMS = PEPE.map(([roomType, roomObject]) => {
       // Extract room numbers and their corresponding bookings
@@ -510,9 +535,12 @@ function BookingChartScreen({navigation, route}: any) {
         filledROW.length,
         dates.length,
       ); */
-      const renderSingleCellData = ROW.some(item => item !== ' ')
+      const renderSingleCellData = ROW.some(
+        item => typeof item !== 'string' && item.bookingID !== null,
+      )
         ? filledROW
         : emptyArray;
+
       //console.log('renderROW:', ROW, emptyArray.length, filledROW);
       return {
         roomType: i.roomType,
@@ -545,7 +573,7 @@ function BookingChartScreen({navigation, route}: any) {
           data={[0]}
           ref={horizontalFlatListRef}
           horizontal
-          style={{backgroundColor: 'orange', flex: 1}}
+          style={{backgroundColor: 'lightgray', flex: 1}}
           renderItem={() => (
             <FlatList
               style={{backgroundColor: 'yellow'}}
@@ -573,19 +601,13 @@ function BookingChartScreen({navigation, route}: any) {
       </View>
     );
   };
-  {
-    /*   <FlatList
-    data={renderSingleCellData}//['ASD','BSD','CSD']
-    renderItem={RenderItem}
-    keyExtractor={(item, index) => index.toString()}
-    horizontal={true}
-    extraData={bookingGrid}
-    /> */
-  }
-  //console.log('bookingGrid:', Object.entries(bookingGrid));
+
   return (
     <View style={{flex: 1}}>
-      <Button title={'fetch data bookings'} onPress={() => fetchData()} />
+      <Button
+        title={'fetch data bookings'}
+        onPress={() => fetchBookingsAndRooms()}
+      />
       <Button title={'handleStates()'} onPress={() => handleStates()} />
       <Button title={'NEXTWEEK'} onPress={() => handleAddWeek()} />
       <Button title={'PREVIOUSWEEK'} onPress={() => handleMinusWeek()} />
