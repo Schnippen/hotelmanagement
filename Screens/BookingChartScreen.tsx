@@ -496,8 +496,10 @@ function BookingChartScreen({navigation, route}: any) {
     return (
       <View style={{backgroundColor: 'gray', flexDirection: 'row', flex: 1}}>
         <FlatList
-          data={rowData} // make it into  component
-          renderItem={({item, index}) => (
+          data={rowData}
+          renderItem={(
+            {item, index}, // make it into  component
+          ) => (
             <View
               style={{
                 flexDirection: 'column',
@@ -570,112 +572,3 @@ function BookingChartScreen({navigation, route}: any) {
 }
 
 export default BookingChartScreen;
-/*   const fetchBookingsAndRooms = async (
-    later_date: string,
-    earlier_date: string,
-  ) => {
-    try {
-      console.log('trying to fetch');
-
-      // Fetch booking and room data simultaneously
-      const [bookingResponse, roomResponse] = await Promise.all([
-        supabase
-          .from('booking')
-          .select(
-            'id,booking_room(room_id(*,room_class_id(*,id))),guest_id(first_name,last_name),booking_color,checkin_date,checkout_date',
-          )
-          .filter('checkin_date', 'lte', later_date)
-          .filter('checkout_date', 'gte', earlier_date),
-        supabase
-          .from('room')
-          .select(
-            'id,room_number,room_class_id(class_name),floor_id(floor_number)',
-          ),
-      ]);
-
-      const {data: booking, error: bookingError} = bookingResponse;
-      const {data: room, error: roomError} = roomResponse;
-
-      //console.log('booking', booking);
-      //console.log('room', room);
-
-      //console.info('stringify booking:', JSON.stringify(booking, null, 2));
-      //console.info('stringify room:', JSON.stringify(room, null, 2));
-
-      setState(booking);
-      setRoomDetails(room);
-
-      // Handle errors from both requests
-      if (bookingError) {
-        console.error('Error fetching booking data:', bookingError);
-        setState([]);
-      }
-      if (roomError) {
-        console.error('Error fetching room data:', roomError);
-        setRoomDetails([]);
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      return error;
-    }
-  };
- */
-
-/* 
-    function organizeBookingsIntoGrid(
-      bookings: TBookingChart[],
-      rooms: TRoomFetch[],
-      startDate: Date,
-      endDate: Date,
-    ) {
-      const bookingGrid: TBookingGrid<string> = {};
-      const dates: Array<Date> = [];
-      const currentDate = new Date(startDate);
-      // Iterate through each day within the date range
-      while (currentDate <= endDate) {
-        // Add the current date to the array of dates
-        dates.push(new Date(currentDate));
-        currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
-      }
-      if (!bookings || !rooms) {
-        throw new Error('Bookings or rooms are null');
-      }
-      // Initialize the booking grid with empty arrays for each room type and room number
-      rooms.forEach(room => {
-        const roomType = room.room_class_id.class_name;
-        if (!bookingGrid[roomType]) {
-          bookingGrid[roomType] = {};
-        }
-        bookingGrid[roomType][room.room_number] = [];
-      });
-
-      // Populate the booking grid with booking IDs
-      bookings.forEach(booking => {
-        const roomType = booking.booking_room.room_id.room_class_id.class_name;
-        const roomNumber = booking.booking_room.room_id.room_number;
-        const checkinDate = new Date(booking.checkin_date);
-        const checkoutDate = new Date(booking.checkout_date);
-
-        // Check if the booking falls within the date range
-        if (checkinDate <= endDate && checkoutDate >= startDate) {
-          // Iterate over dates and add the booking object to the corresponding room and date
-          dates.forEach(date => {
-            if (date) {
-              const bookingObject = {
-                day: date.toISOString(),
-                bookingID:
-                  date >= checkinDate && date <= checkoutDate
-                    ? booking.id
-                    : null,
-              }; // Convert date to ISO string format
-              bookingGrid[roomType][roomNumber].push(bookingObject);
-            }
-          });
-        }
-      });
-
-      // Return the booking grid and dates
-      console.log(JSON.stringify(bookingGrid), dates);
-      return {bookingGrid, dates};
-    }
- */
