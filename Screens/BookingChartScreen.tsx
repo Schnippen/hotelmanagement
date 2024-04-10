@@ -1,19 +1,15 @@
 import {Button, Icon, Text} from '@rneui/themed';
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Dimensions,
   FlatList,
   NativeScrollEvent,
   NativeScrollPoint,
   NativeSyntheticEvent,
-  ScrollView,
-  Touchable,
   TouchableOpacity,
   View,
 } from 'react-native';
 import {supabase} from '../Supabase/supabase';
-import {useSelector} from 'react-redux';
-import {RootState} from '../Store/store';
 import {
   TBookingChart,
   TBookingGrid,
@@ -21,6 +17,8 @@ import {
   TRoomFetch,
 } from '../Types/types';
 import {useQuery} from '@tanstack/react-query';
+import {organizeBookingsIntoGrid} from '../Utils/functions';
+import {fetchBookingsAndRooms} from '../Utils/fetchFunctions';
 /* const IconCalendar = <Icon name="edit-calendar" size={30} color="black" />;
 <TouchableOpacity style={{width:windowWidth/6,justifyContent:"center",alignItems:"center",}} activeOpacity={0.2} onPress={()=>console.log("press Calendar")}>
 {IconCalendar} 
@@ -85,148 +83,33 @@ let ROOM = [
 type TDateStrings = string[];
 
 function BookingChartScreen({navigation, route}: any) {
-  const fetchBookingsAndRooms = async () => {
-    try {
-      console.log('trying to fetch');
-
-      // Fetch booking and room data simultaneously
-      const [bookingResponse, roomResponse] = await Promise.all([
-        supabase
-          .from('booking')
-          .select(
-            'id,booking_room(room_id(*,room_class_id(*,id))),guest_id(first_name,last_name),booking_color,checkin_date,checkout_date',
-          )
-          .filter('checkin_date', 'lte', later_date)
-          .filter('checkout_date', 'gte', earlier_date),
-        supabase
-          .from('room')
-          .select(
-            'id,room_number,room_class_id(class_name),floor_id(floor_number)',
-          ),
-      ]);
-
-      const {data: booking, error: bookingError} = bookingResponse;
-      const {data: room, error: roomError} = roomResponse;
-
-      //console.log('booking', booking);
-      //console.log('room', room);
-
-      //console.info('stringify booking:', JSON.stringify(booking, null, 2));
-      //console.info('stringify room:', JSON.stringify(room, null, 2));
-
-      setState(booking);
-      setRoomDetails(room);
-
-      // Handle errors from both requests
-      if (bookingError) {
-        console.error('Error fetching booking data:', bookingError);
-        setState([]);
-      }
-      if (roomError) {
-        console.error('Error fetching room data:', roomError);
-        setRoomDetails([]);
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      return error;
-    }
-  };
-
-  const {data, isLoading, error, isSuccess} = useQuery({
-    queryKey: ['BookingChart'],
-    queryFn: fetchBookingsAndRooms,
-  });
-
   const [state, setState] = useState<TBookingChart[] | null>(null);
   const [roomDetails, setRoomDetails] = useState<TRoomFetch[] | null>(null);
   const [bookingGrid, setBookingGrid] = useState<TBookingGrid<string>>({});
   const [dates, setDates] = useState<TDateStrings>([]);
+  const [dateVariable, setDateVariable] = useState<number>(7); // maybe i will add a selectable time period
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [futureDate, setFutureDate] = useState<Date>(() => {
+    const nextWeek = new Date(currentDate);
+    nextWeek.setDate(currentDate.getDate() + 7); // futureDate to currentDate + 7 days
+    return nextWeek;
+  });
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   const cellWidth = windowHeight / 5;
-  const cellBorderColor = 'lightgray';
+  const cellBorderColor = 'lightgray'; //TODO create global styles for app in the future
   const cellBackgroundColor = 'white';
   const defaultColor = '#B185A7';
   const cellColumnColor1 = '#E8DBC5';
   const cellColumnColor2 = '#FFF4E9';
-  console.log('DATES STATE:', dates);
-  const todayDate = useSelector(
-    (state: RootState) => state.currentISODate.value,
-  );
-
-  function organizeBookingsIntoGrid(
-    bookings: TBookingChart[],
-    rooms: TRoomFetch[],
-    startDate: Date,
-    endDate: Date,
-  ) {
-    const bookingGrid: TBookingGrid<string> = {};
-    const dates: Array<Date> = [];
-    const currentDate = new Date(startDate);
-    // Iterate through each day within the date range
-    while (currentDate <= endDate) {
-      // Add the current date to the array of dates
-      dates.push(new Date(currentDate));
-      currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
-    }
-    if (!bookings || !rooms) {
-      throw new Error('Bookings or rooms are null');
-    }
-    // Initialize the booking grid with empty arrays for each room type and room number
-    rooms.forEach(room => {
-      const roomType = room.room_class_id.class_name;
-      if (!bookingGrid[roomType]) {
-        bookingGrid[roomType] = {};
-      }
-      bookingGrid[roomType][room.room_number] = [];
-    });
-
-    // Populate the booking grid with booking IDs
-    bookings.forEach(booking => {
-      const roomType = booking.booking_room.room_id.room_class_id.class_name;
-      const roomNumber = booking.booking_room.room_id.room_number;
-      const checkinDate = new Date(booking.checkin_date);
-      const checkoutDate = new Date(booking.checkout_date);
-
-      // Check if the booking falls within the date range
-      if (checkinDate <= endDate && checkoutDate >= startDate) {
-        // Iterate over dates and add the booking object to the corresponding room and date
-        dates.forEach(date => {
-          if (date) {
-            const bookingObject = {
-              day: date.toISOString(),
-              bookingID:
-                date >= checkinDate && date <= checkoutDate ? booking.id : null,
-            }; // Convert date to ISO string format
-            bookingGrid[roomType][roomNumber].push(bookingObject);
-          }
-        });
-      }
-    });
-
-    // Return the booking grid and dates
-    console.log(JSON.stringify(bookingGrid), dates);
-    return {bookingGrid, dates};
-  }
-
-  // Call the function with the list of bookings, rooms, and date range
-
-  //const { bookingGrid, dates } = organizeBookingsIntoGrid(BOOKING, ROOM, startDate, endDate);
-
   const handleStates = () => {
     //console.log("PIIPIPIP",startDate,endDate,earlier_date,later_date)
-    /* const {bookingGrid, dates} = organizeBookingsIntoGrid(
+    /*   const {bookingGrid, dates} = organizeBookingsIntoGrid(
       state,
       roomDetails,
       startDate,
       endDate,
     ); */
-    const {bookingGrid, dates} = organizeBookingsIntoGrid(
-      state,
-      roomDetails,
-      startDate,
-      endDate,
-    );
     setBookingGrid(bookingGrid);
     const arrayOfDatesStrings = dates.map(item => item.toISOString()); // IMPORTANT
     setDates(arrayOfDatesStrings); // HERE DATES ARE SET FOR FLATLIST
@@ -238,13 +121,6 @@ function BookingChartScreen({navigation, route}: any) {
     );
   };
 
-  const [dateVariable, setDateVariable] = useState<number>(7); // maybe i will add a selectable time period
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [futureDate, setFutureDate] = useState<Date>(() => {
-    const nextWeek = new Date(currentDate);
-    nextWeek.setDate(currentDate.getDate() + 7); // futureDate to currentDate + 7 days
-    return nextWeek;
-  });
   const handleAddWeek = () => {
     const nextWeek = new Date(futureDate);
     nextWeek.setDate(futureDate.getDate() + 7);
@@ -280,6 +156,61 @@ function BookingChartScreen({navigation, route}: any) {
     'early_date:',
     earlier_date,
   ); */
+
+  const {
+    data: result,
+    isLoading,
+    error,
+    isSuccess,
+  } = useQuery({
+    queryKey: ['BookingChart'],
+    queryFn: () => fetchBookingsAndRooms([later_date, earlier_date]),
+    staleTime: 30000,
+  });
+  console.log(
+    'result:',
+    result?.booking,
+    result?.room,
+    later_date,
+    earlier_date,
+  );
+
+  useEffect(() => {
+    if (isSuccess && !isLoading && result) {
+      setState(result?.booking);
+      setRoomDetails(result?.room);
+      const {bookingGrid, dates} = organizeBookingsIntoGrid(
+        result?.booking,
+        result?.room,
+        startDate,
+        endDate,
+      );
+      if (bookingGrid && dates) {
+        console.log('fetching:', dates);
+        setBookingGrid(bookingGrid);
+        const arrayOfDatesStrings = dates.map(item => item.toISOString());
+        setDates(arrayOfDatesStrings);
+      }
+    }
+  }, [result, isLoading, isSuccess]);
+
+  /*    if (booking && room) {
+     setState(booking);
+     setRoomDetails(room);
+
+     const {bookingGrid, dates} = organizeBookingsIntoGrid(
+       booking,
+       room,
+       startDate,
+       endDate,
+     );
+     if (bookingGrid && dates) {
+       console.log('fetching:', dates);
+       setBookingGrid(bookingGrid);
+       const arrayOfDatesStrings = dates.map(item => item.toISOString());
+       setDates(arrayOfDatesStrings);
+     }
+   } */
 
   const DayPanel = ({date, index}: {date: any; index: number}) => {
     const dateString = date;
@@ -440,14 +371,27 @@ function BookingChartScreen({navigation, route}: any) {
       const foundObject = getObjectById(item);
 
       if (foundObject) {
+        //console.log(index, dates);
         const cellColor = foundObject.booking_color;
         const cellFirstName = foundObject.guest_id.first_name;
         const cellLastName = foundObject.guest_id.last_name;
-        const objCheckIn = foundObject.checkin_date.split('T')[0];
-        const objCheckOut = foundObject.checkout_date.split('T')[0];
-        const checkInStyle = objCheckIn === dates[index].split('T')[0];
-        const checkOutStyle = objCheckOut === dates[index].split('T')[0];
-        //console.log(dates[index]);
+        const objCheckIn = new Date(foundObject.checkin_date).toISOString();
+        const objCheckOut = new Date(foundObject.checkout_date).toISOString();
+        const dateAtIndex = dates[index]
+          ? new Date(dates[index]).toISOString()
+          : ' '; //TODO fix the render of dates
+
+        const checkInStyle = objCheckIn === dateAtIndex;
+        const checkOutStyle = objCheckOut === dateAtIndex;
+        /*     console.log(
+          'dateAtIndex:',
+          dateAtIndex,
+          'objCheckIn:',
+          objCheckOut,
+          checkInStyle,
+          checkOutStyle,
+          dates[index],
+        ); */
         return (
           <View
             style={{
@@ -604,13 +548,9 @@ function BookingChartScreen({navigation, route}: any) {
 
   return (
     <View style={{flex: 1}}>
-      <Button
-        title={'fetch data bookings'}
-        onPress={() => fetchBookingsAndRooms()}
-      />
       <Button title={'handleStates()'} onPress={() => handleStates()} />
-      <Button title={'NEXTWEEK'} onPress={() => handleAddWeek()} />
-      <Button title={'PREVIOUSWEEK'} onPress={() => handleMinusWeek()} />
+      <Button title={'NEXT_WEEK'} onPress={() => handleAddWeek()} />
+      <Button title={'PREVIOUS_WEEK'} onPress={() => handleMinusWeek()} />
       <Button
         title={'ORGANIZE()'}
         onPress={() =>
@@ -630,3 +570,112 @@ function BookingChartScreen({navigation, route}: any) {
 }
 
 export default BookingChartScreen;
+/*   const fetchBookingsAndRooms = async (
+    later_date: string,
+    earlier_date: string,
+  ) => {
+    try {
+      console.log('trying to fetch');
+
+      // Fetch booking and room data simultaneously
+      const [bookingResponse, roomResponse] = await Promise.all([
+        supabase
+          .from('booking')
+          .select(
+            'id,booking_room(room_id(*,room_class_id(*,id))),guest_id(first_name,last_name),booking_color,checkin_date,checkout_date',
+          )
+          .filter('checkin_date', 'lte', later_date)
+          .filter('checkout_date', 'gte', earlier_date),
+        supabase
+          .from('room')
+          .select(
+            'id,room_number,room_class_id(class_name),floor_id(floor_number)',
+          ),
+      ]);
+
+      const {data: booking, error: bookingError} = bookingResponse;
+      const {data: room, error: roomError} = roomResponse;
+
+      //console.log('booking', booking);
+      //console.log('room', room);
+
+      //console.info('stringify booking:', JSON.stringify(booking, null, 2));
+      //console.info('stringify room:', JSON.stringify(room, null, 2));
+
+      setState(booking);
+      setRoomDetails(room);
+
+      // Handle errors from both requests
+      if (bookingError) {
+        console.error('Error fetching booking data:', bookingError);
+        setState([]);
+      }
+      if (roomError) {
+        console.error('Error fetching room data:', roomError);
+        setRoomDetails([]);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      return error;
+    }
+  };
+ */
+
+/* 
+    function organizeBookingsIntoGrid(
+      bookings: TBookingChart[],
+      rooms: TRoomFetch[],
+      startDate: Date,
+      endDate: Date,
+    ) {
+      const bookingGrid: TBookingGrid<string> = {};
+      const dates: Array<Date> = [];
+      const currentDate = new Date(startDate);
+      // Iterate through each day within the date range
+      while (currentDate <= endDate) {
+        // Add the current date to the array of dates
+        dates.push(new Date(currentDate));
+        currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
+      }
+      if (!bookings || !rooms) {
+        throw new Error('Bookings or rooms are null');
+      }
+      // Initialize the booking grid with empty arrays for each room type and room number
+      rooms.forEach(room => {
+        const roomType = room.room_class_id.class_name;
+        if (!bookingGrid[roomType]) {
+          bookingGrid[roomType] = {};
+        }
+        bookingGrid[roomType][room.room_number] = [];
+      });
+
+      // Populate the booking grid with booking IDs
+      bookings.forEach(booking => {
+        const roomType = booking.booking_room.room_id.room_class_id.class_name;
+        const roomNumber = booking.booking_room.room_id.room_number;
+        const checkinDate = new Date(booking.checkin_date);
+        const checkoutDate = new Date(booking.checkout_date);
+
+        // Check if the booking falls within the date range
+        if (checkinDate <= endDate && checkoutDate >= startDate) {
+          // Iterate over dates and add the booking object to the corresponding room and date
+          dates.forEach(date => {
+            if (date) {
+              const bookingObject = {
+                day: date.toISOString(),
+                bookingID:
+                  date >= checkinDate && date <= checkoutDate
+                    ? booking.id
+                    : null,
+              }; // Convert date to ISO string format
+              bookingGrid[roomType][roomNumber].push(bookingObject);
+            }
+          });
+        }
+      });
+
+      // Return the booking grid and dates
+      console.log(JSON.stringify(bookingGrid), dates);
+      return {bookingGrid, dates};
+    }
+ */
