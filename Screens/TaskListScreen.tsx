@@ -1,10 +1,12 @@
 import React, {useState} from 'react';
-import {Text, View} from 'react-native';
+import {FlatList, View, Dimensions} from 'react-native';
 import {supabase} from '../Supabase/supabase';
-import {Button, Skeleton} from '@rneui/themed';
+import {Button, Skeleton, Text} from '@rneui/themed';
 import {useQuery} from '@tanstack/react-query';
 import LinearGradient from 'react-native-linear-gradient';
 import {CheckBox} from '@rneui/themed/dist/CheckBox';
+import {useSelector} from 'react-redux';
+import {RootState} from '../Store/store';
 
 type Task = {
   id: string;
@@ -12,9 +14,14 @@ type Task = {
   description: string;
   due_date: string;
   completed: boolean;
+  color: string;
 };
 
 function TaskListScreen() {
+  const currentDay = new Date();
+  console.log(currentDay);
+  const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
   //const [tasks, setTasks] = useState< Task[]|null>(null);
   const fetchData = async () => {
     try {
@@ -38,20 +45,30 @@ function TaskListScreen() {
   const {data, isLoading, error, isSuccess} = useQuery({
     queryKey: ['tasks'],
     queryFn: fetchData,
+    staleTime: 30000,
   });
 
   console.info('QUERY:', JSON.stringify(data, null, 2));
 
   if (isLoading) {
+    const SkeletonTaskComponent = () => {
+      return (
+        <View style={{marginVertical: 10, marginHorizontal: 10}}>
+          <Skeleton
+            LinearGradientComponent={LinearGradient}
+            animation="wave"
+            width={windowWidth - 20}
+            height={200}
+            style={{borderRadius: 10}}
+          />
+        </View>
+      );
+    };
     return (
-      <View style={{flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-        <Skeleton
-          LinearGradientComponent={LinearGradient}
-          animation="wave"
-          width={300}
-          height={200}
-        />
-      </View>
+      <FlatList
+        data={['1', '2']}
+        renderItem={({item, index}) => <SkeletonTaskComponent />}
+      />
     );
   }
 
@@ -62,16 +79,61 @@ function TaskListScreen() {
       </View>
     );
   }
+  function dateDiffInDays(a: Date, b: Date) {
+    const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+    // Discard the time and time-zone information.
+    const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+    const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+
+    return Math.floor((utc2 - utc1) / _MS_PER_DAY);
+  }
 
   const TaskComponent = (item: Task) => {
+    const [done, setDone] = useState<boolean>(false);
+    const dueToDate = new Date(item.due_date);
+    const daysLeft = dateDiffInDays(currentDay, dueToDate);
+    console.log(daysLeft + ' days');
+    console.log('due:', dueToDate, currentDay);
+    const CheckBoxContainer = () => {
+      return (
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: 'lightblue',
+          }}>
+          <CheckBox checked={done} size={32} onPress={() => setDone(!done)} />
+          <Text>{item.completed ? 'COMPLETED' : 'NOT DONE'}</Text>
+        </View>
+      );
+    };
+
     return (
-      <View style={{borderStartColor: 'lightgray'}}>
-        <Text>{item.id}</Text>
-        <Text>{item.title}</Text>
-        <Text>{item.description}</Text>
-        <Text>{item.due_date}</Text>
-        <CheckBox checked size={32} />
-        <Text>{item.completed ? 'COMPLETED' : 'NOT DONE'}</Text>
+      <View
+        style={{
+          backgroundColor: 'red',
+          height: 200,
+          marginVertical: 10,
+          marginHorizontal: 10,
+          flexDirection: 'row',
+          borderRadius: 10,
+        }}>
+        <View
+          style={{
+            borderTopLeftRadius: 10,
+            borderBottomLeftRadius: 10,
+            height: 200,
+            width: 20,
+            backgroundColor: item.color ? item.color : 'lightgray',
+          }}
+        />
+        <View style={{flexDirection: 'column', flex: 1, padding: 10}}>
+          {/* <Text>{item.id}</Text> */}
+          <Text h4>{item.title}</Text>
+          <Text>{item.description}</Text>
+          <Text>{item.due_date}</Text>
+          <CheckBoxContainer />
+        </View>
       </View>
     );
   };
@@ -79,12 +141,16 @@ function TaskListScreen() {
   if (isSuccess) {
     const taskList = data as Task[];
     return (
-      <View>
+      <View style={{flex: 1}}>
         <Text>TaskListScreen</Text>
         <Button title="FETCH DATA" onPress={fetchData} />
-        {taskList.map(item => (
-          <TaskComponent key={item.id} {...item} />
-        ))}
+        <FlatList
+          data={taskList}
+          renderItem={({item, index}) => (
+            <TaskComponent key={item.id} {...item} />
+          )}
+          keyExtractor={(item, index) => item.id}
+        />
       </View>
     );
   }
