@@ -163,7 +163,7 @@ function BookingChartScreen({navigation, route}: any) {
     error,
     isSuccess,
   } = useQuery({
-    queryKey: ['BookingChart'],
+    queryKey: ['BookingChart', futureDate],
     queryFn: () => fetchBookingsAndRooms([later_date, earlier_date]),
     staleTime: 30000,
   });
@@ -323,7 +323,7 @@ function BookingChartScreen({navigation, route}: any) {
       </View>
     );
   };
-  // TRYING TO OPTIMIZE FLATLIST wih callback :) ?
+  // TRYING TO OPTIMIZE FLATLIST with callback :) ?
   const RenderItem = useCallback(
     ({item, index}: {item: TBookingObject; index: number}) => {
       const columnRemainder = index % 2 === 0;
