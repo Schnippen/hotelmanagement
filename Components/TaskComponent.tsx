@@ -56,7 +56,7 @@ const TaskComponent = (item: Task) => {
   const initial = item.completed;
   const [done, setDone] = useState<boolean>(initial);
   const currentDay = new Date();
-  console.log(item.id, done, item.completed, 'DONE', done);
+  //console.log(item.id, done, item.completed, 'DONE', done);
   const client = useQueryClient();
   const {mutate: updateTask} = useMutation({
     mutationFn: () => updateTaskCompletion(ID, !done),

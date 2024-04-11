@@ -69,6 +69,7 @@ function TaskListScreen() {
 
   if (isSuccess) {
     const taskList = data as Task[];
+    //console.log('tasks Sort:', taskList.sort()); //TODO create timestamp with date of creation on the backEnd
     return (
       <View style={{flex: 1}}>
         <Text>TaskListScreen</Text>
