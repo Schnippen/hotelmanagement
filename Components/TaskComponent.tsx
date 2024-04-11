@@ -1,11 +1,13 @@
-import {Button, CheckBox, Text} from '@rneui/themed';
+import {CheckBox, Text} from '@rneui/themed';
 import React, {useState} from 'react';
-import {View} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import {dateDiffInDays, formatDate} from '../Utils/functionsTasks';
 import {Task} from '../Screens/TaskListScreen';
 import {supabase} from '../Supabase/supabase';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
+//TODO filter by id, delete, edit etc
 const updateTaskCompletion = async (
   id: string,
   newValue: boolean,
@@ -29,6 +31,25 @@ const updateTaskCompletion = async (
     throw error;
   }
 };
+const deleteTask = async (id: string): Promise<void> => {
+  try {
+    console.log('Trying to delete task with ID:', id);
+    const {data: updatedTasks, error} = await supabase
+      .from('todo_table_class')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting task:', error);
+      throw new Error('Failed to update task');
+    }
+    console.log('Task successfully updated:', updatedTasks);
+    return;
+  } catch (error) {
+    console.error('Error deleting task:', error);
+    throw error;
+  }
+};
 
 const TaskComponent = (item: Task) => {
   const ID = item.id;
@@ -37,7 +58,7 @@ const TaskComponent = (item: Task) => {
   const currentDay = new Date();
   console.log(item.id, done, item.completed, 'DONE', done);
   const client = useQueryClient();
-  const {mutate} = useMutation({
+  const {mutate: updateTask} = useMutation({
     mutationFn: () => updateTaskCompletion(ID, !done),
     onError: error => {
       // An error happened!
@@ -52,16 +73,23 @@ const TaskComponent = (item: Task) => {
     },
     onSettled: (data, error, variables, context) => {
       // Error or success... doesn't matter!
-      console.log("I'm second!");
+      console.log("Mutation completed - I'm second!");
     },
   });
-  /*   const handleCompleted = () => {
-    const newDone = !done;
-    setDone(newDone);
-    console.log('DONE:', done);
-    updateTaskCompletion(ID, newDone);
-  }; */
-
+  const {mutate: removeTask} = useMutation({
+    mutationFn: () => deleteTask(ID),
+    onError: error => {
+      console.log(`onError: ${error}`);
+    },
+    onSuccess: () => {
+      console.log('Task deletion successful!');
+      // Optionally, you can invalidate the queries here as well
+      client.invalidateQueries(['tasks']);
+    },
+    onSettled: (data, error, variables, context) => {
+      console.log('Mutation completed!');
+    },
+  });
   const CheckBoxContainer = () => {
     return (
       <View
@@ -69,19 +97,18 @@ const TaskComponent = (item: Task) => {
           flexDirection: 'row',
           alignItems: 'center',
           backgroundColor: 'lightblue',
+          flex: 1,
         }}>
         <CheckBox
+          containerStyle={{backgroundColor: 'pink'}}
+          wrapperStyle={{backgroundColor: 'red'}}
           checked={item.completed}
           size={32}
           onPress={async () => {
-            //handleCompleted();
-            //await updateTaskCompletion(ID, newDone);
-            await mutate();
+            await updateTask();
           }}
+          title={item.completed ? 'COMPLETED' : 'NOT DONE'}
         />
-        <Text>{item.completed ? 'COMPLETED' : 'NOT DONE'}</Text>
-        {/*         <Button title={'sda'} onPress={() => handleCompleted()}></Button>
-         */}
       </View>
     );
   };
@@ -97,7 +124,7 @@ const TaskComponent = (item: Task) => {
     <View
       style={{
         backgroundColor: 'gray',
-        height: 200,
+        minHeight: 200,
         marginVertical: 10,
         marginHorizontal: 10,
         flexDirection: 'row',
@@ -114,6 +141,7 @@ const TaskComponent = (item: Task) => {
       />
       <View style={{flexDirection: 'column', flex: 1, padding: 10}}>
         {/* <Text>{item.id}</Text> */}
+
         <Text h3>{item.title}</Text>
         <Text>{item.description}</Text>
         <Text>{DueTo}</Text>
@@ -125,3 +153,18 @@ const TaskComponent = (item: Task) => {
 };
 
 export default TaskComponent;
+
+/* 
+        <TouchableOpacity
+          style={{
+            position: 'absolute',
+            width: 50,
+            height: 50,
+            top: 0,
+            right: 0,
+            backgroundColor: 'red',
+            borderTopRightRadius: 10,
+          }}
+          onPress={() => console.log('pressed')}>
+          <Icon name="trash" color="white" />
+        </TouchableOpacity>; */
