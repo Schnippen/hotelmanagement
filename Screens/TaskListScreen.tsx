@@ -5,8 +5,6 @@ import {Button, Skeleton, Text} from '@rneui/themed';
 import {useQuery} from '@tanstack/react-query';
 import LinearGradient from 'react-native-linear-gradient';
 import {CheckBox} from '@rneui/themed/dist/CheckBox';
-import {useSelector} from 'react-redux';
-import {RootState} from '../Store/store';
 
 type Task = {
   id: string;
@@ -23,7 +21,7 @@ function TaskListScreen() {
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
   //const [tasks, setTasks] = useState< Task[]|null>(null);
-  const fetchData = async () => {
+  const fetchTasksData = async () => {
     try {
       console.log('trying to fetch');
       let {data: tasks, error} = await supabase
@@ -44,11 +42,11 @@ function TaskListScreen() {
 
   const {data, isLoading, error, isSuccess} = useQuery({
     queryKey: ['tasks'],
-    queryFn: fetchData,
+    queryFn: fetchTasksData,
     staleTime: 30000,
   });
 
-  console.info('QUERY:', JSON.stringify(data, null, 2));
+  //console.info('QUERY:', JSON.stringify(data, null, 2));
 
   if (isLoading) {
     const SkeletonTaskComponent = () => {
@@ -79,21 +77,53 @@ function TaskListScreen() {
       </View>
     );
   }
+
   function dateDiffInDays(a: Date, b: Date) {
     const _MS_PER_DAY = 1000 * 60 * 60 * 24;
     // Discard the time and time-zone information.
     const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
     const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+    const timeLeftInDays = Math.floor((utc2 - utc1) / _MS_PER_DAY);
+    if (timeLeftInDays === 0) {
+      const timeDiff = b.getTime() - a.getTime();
+      const hoursLeft = Math.floor(timeDiff / (1000 * 60 * 60));
+      const minutesLeft = Math.floor(
+        (timeDiff % (1000 * 60 * 60)) / (1000 * 60),
+      );
+      const isNegative = !!Math.sign(minutesLeft);
+      console.log('is NEgative:', isNegative);
+      const timeLeftString = `${hoursLeft} hours and ${minutesLeft} minutes left`;
+      const timeLeftStringOverdue = `${hoursLeft * -1} hours and ${
+        minutesLeft * -1
+      } minutes  overdue`;
+      const result = isNegative ? timeLeftStringOverdue : timeLeftString;
+      return <Text style={{color: isNegative ? '#f05d5d' : ''}}>{result}</Text>;
+    } else if (-1 >= timeLeftInDays) {
+      const timeLeftString = `${timeLeftInDays} days overdue`;
+      return <Text style={{color: '#f05d5d'}}>{timeLeftString}</Text>;
+    } else {
+      const timeLeftString = `${timeLeftInDays} days`;
+      return <Text>{timeLeftString}</Text>;
+    }
+  }
 
-    return Math.floor((utc2 - utc1) / _MS_PER_DAY);
+  function formatDate(dateString: string) {
+    const date = new Date(dateString); //TODO, make room for changing it to AM PM in settings
+    const timeString = date.toLocaleTimeString('en-US', {
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    const day = date.getDate();
+    const month = date.toLocaleDateString('en-US', {month: 'short'});
+    const year = date.getFullYear();
+    const result = `${timeString}, ${day} ${month} ${year}`;
+    return result;
   }
 
   const TaskComponent = (item: Task) => {
-    const [done, setDone] = useState<boolean>(false);
-    const dueToDate = new Date(item.due_date);
-    const daysLeft = dateDiffInDays(currentDay, dueToDate);
-    console.log(daysLeft + ' days');
-    console.log('due:', dueToDate, currentDay);
+    const [done, setDone] = useState<boolean>(item.completed);
+    console.log(item.completed);
     const CheckBoxContainer = () => {
       return (
         <View
@@ -108,10 +138,18 @@ function TaskListScreen() {
       );
     };
 
+    const DaysLeft = () => {
+      const dueToDate = new Date(item.due_date);
+      const daysLeft = dateDiffInDays(currentDay, dueToDate);
+      //console.log('due:', dueToDate, currentDay, daysLeft);
+      return daysLeft;
+    };
+    const DueTo = formatDate(item.due_date);
+    console.log(formatDate(item.due_date));
     return (
       <View
         style={{
-          backgroundColor: 'red',
+          backgroundColor: 'gray',
           height: 200,
           marginVertical: 10,
           marginHorizontal: 10,
@@ -129,9 +167,10 @@ function TaskListScreen() {
         />
         <View style={{flexDirection: 'column', flex: 1, padding: 10}}>
           {/* <Text>{item.id}</Text> */}
-          <Text h4>{item.title}</Text>
+          <Text h3>{item.title}</Text>
           <Text>{item.description}</Text>
-          <Text>{item.due_date}</Text>
+          <Text>{DueTo}</Text>
+          <DaysLeft />
           <CheckBoxContainer />
         </View>
       </View>
@@ -143,7 +182,8 @@ function TaskListScreen() {
     return (
       <View style={{flex: 1}}>
         <Text>TaskListScreen</Text>
-        <Button title="FETCH DATA" onPress={fetchData} />
+        {/*         <Button title="FETCH DATA" onPress={fetchData} />
+         */}
         <FlatList
           data={taskList}
           renderItem={({item, index}) => (
