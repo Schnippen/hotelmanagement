@@ -4481,7 +4481,7 @@ inkscape:export-ydpi="180">
    </g>
  </g>
 </g>
-</svg>b`;
+</svg>`;
 const NanSVG = `<svg
 xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
 xmlns:dc="http://purl.org/dc/elements/1.1/"
@@ -14483,7 +14483,7 @@ inkscape:export-ydpi="180">
       cy="612.17273"
       r="13.404437" />
    <circle
-      style="opacity:1;fill:#004900;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:30;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+BB      style="opacity:1;fill:#004900;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:30;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
       id="circle4315"
       cx="406.89658"
       cy="574.39923"
@@ -16448,7 +16448,7 @@ inkscape:export-ydpi="180">
 </svg>`;
 
 
-const tilesSVGsArray = [
+export const mahjongTilesSVGsArray = [
     BackSVG, BlankSVG, ChunSVG, FrontSVG, HakuSVG, HatsuSVG, Man1SVG, Man2SVG, Man3SVG, Man4SVG,
     Man5_DoraSVG, Man5SVG, Man6SVG, Man7SVG, Man8SVG, Man9SVG, NanSVG, PeiSVG, Pin1SVG, Pin2SVG,
     Pin3SVG, Pin4SVG, Pin5_DoraSVG, Pin5SVG, Pin6SVG, Pin7SVG, Pin8SVG, Pin9SVG, ShaaSVG,
