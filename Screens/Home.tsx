@@ -75,6 +75,8 @@ function HomeScreen({navigation}: any) {
           onPress={() => navigation.navigate('DashboardScreen')}/>
         <Button title="BookingChartScreen"
         onPress={() => navigation.navigate('BookingChartScreen')}/>
+         <Button title="MahjongScreen"
+        onPress={() => navigation.navigate('MahjongScreen')}/>
         {myIcon}
         <Text>{GLOBALAUTH?.user.email}</Text>
         <Text>TODO:</Text>

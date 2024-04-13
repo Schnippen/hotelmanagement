@@ -22,6 +22,7 @@ import TaskListScreen from './Screens/TaskListScreen';
 import AgendaScreen from './Screens/AgendaScreen';
 import BookingChartScreen from './Screens/BookingChartScreen';
 import DashboardScreen from './Screens/DashboardScreen';
+import MahjongScreen from './Utils/mahjong';
 
 function MainApp() {
   const Stack = createNativeStackNavigator();
@@ -92,6 +93,10 @@ function MainApp() {
           screenOptions={{headerStyle: {backgroundColor: 'papayawhip'}}}>
           <Stack.Screen name="AuthLoginScreen" component={AuthLoginScreen} />
         </Stack.Group>
+        <Stack.Screen
+        name="MahjongScreen"
+        component={MahjongScreen}
+        />
       </Stack.Navigator>  
     </NavigationContainer>
   );
