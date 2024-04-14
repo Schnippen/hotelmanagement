@@ -339,8 +339,204 @@ const Compass = () => {
         </View>
     );
   };
+  
+  const WallTile=({svg,tileRatioProp=3,zIndex}:{svg:string,tileRatioProp:number,zIndex:number})=>{
+    //console.log(svg.length)
+    const tileRatio = tileRatioProp;
+    const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
+    const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
+    const tileDepth = +(14 * tileRatio).toFixed(2); // default 23 // not taking perspective into account
+    const tileImageWidth = +(33.3 * tileRatio).toFixed(2); // default 100
+    const tileImageHeight = +(33.3 * tileRatio).toFixed(2); // default 100
+    const tileSecondLayer = +(tileHeight + (tileDepth * 0.695)).toFixed(2); // 69.5% of tile depth added to tile height
+    const tileBottomLayer = +(tileHeight + tileDepth).toFixed(2)
+    const tileBorderRadiusHandPlayerPerspective = 8;
+    const riverJustifyContent=true
+    const isTileFaceUp=false//TODO fix the perspective
+    const colorBottomLayer="#98dffb"
+    const colorSecondLayer="#44809a"
+    const colorFaceLayer="#a39f9e"
+    return(
+<View style={{backgroundColor:colorFaceLayer,height:tileBottomLayer,width:tileWidth,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,borderWidth:1,zIndex:zIndex}}>
+    <View style={{backgroundColor:colorSecondLayer,height:tileSecondLayer-5,width:tileWidth-2,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,alignItems:"center"}}>
+    <View style={{backgroundColor:colorBottomLayer, height:tileHeight,width:tileWidth-2,alignItems:"center",justifyContent:"center",borderRadius:tileBorderRadiusHandPlayerPerspective}}>
+    <SvgXml width={tileImageWidth} height={tileImageHeight} xml={svg} style={{borderRadius:tileBorderRadiusHandPlayerPerspective,transform: [{rotate: `${0}deg`}]}} />
+    </View>
+    </View>
+    </View>
+    )}
 
+    const WallFront = () => {
+        const evenTiles:any = [];
+        const oddTiles:any = [];
+      
+        mahjongTilesSVGsArray.slice(0,8 ).forEach((item, index) => {
+          const zIndex = index % 2 === 0 ? 1 : 0;
+          if (index % 2 === 0) {
+            evenTiles.push(<WallTile svg={item} tileRatioProp={1} key={index + "a"} zIndex={1} />);
+          } else {
+            oddTiles.push(<WallTile svg={item} tileRatioProp={1} key={index + "a"} zIndex={0} />);
+          }
+        });
+      
+        return (
+          <View style={{ flexDirection: "row", backgroundColor: "lightblue", height: 80,position:"relative" }}>
+            <View style={{backgroundColor:"lime",flexDirection:"row",position:"absolute",top:10}}>
+                {oddTiles}</View>
+            <View style={{backgroundColor:"transparent",flexDirection:"row",position:"absolute",top:0}}>
+            {evenTiles}
+            </View>
+          </View>
+        );
+      };
 
+      const WallTileLeft=({svg,tileRatioProp=3,zIndex}:{svg:string,tileRatioProp:number,zIndex:number})=>{
+        //console.log(svg.length)
+        const tileRatio = tileRatioProp;
+        const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
+        const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
+        const tileDepth = +(14 * tileRatio).toFixed(2); // default 23 // not taking perspective into account
+        const tileImageWidth = +(33.3 * tileRatio).toFixed(2); // default 100
+        const tileImageHeight = +(33.3 * tileRatio).toFixed(2); // default 100
+        const tileSecondLayer = +(tileHeight + (tileDepth * 0.695)).toFixed(2); // 69.5% of tile depth added to tile height
+        const tileBottomLayer = +(tileHeight + tileDepth).toFixed(2) //TODO check the Riverleft values
+        const tileBorderRadiusHandPlayerPerspective = 8;
+        const riverJustifyContent=true
+        const isTileFaceUp=false//TODO fix the perspective
+        const colorBottomLayer="#98dffb"
+        const colorSecondLayer="#44809a"
+        const colorFaceLayer="#a39f9e"
+        return(
+    <View style={{backgroundColor:colorFaceLayer,height:tileWidth+8,width:tileBottomLayer-6,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,borderWidth:1,zIndex:zIndex,marginTop:-6}}>
+        <View style={{backgroundColor:colorSecondLayer,height:tileWidth+2 ,width:tileSecondLayer-5,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,alignItems:"flex-start"}}>
+        <View style={{backgroundColor:colorBottomLayer, height:tileWidth-2,width:tileHeight,alignItems:"center",justifyContent:"center",borderRadius:tileBorderRadiusHandPlayerPerspective}}>
+        <SvgXml width={tileImageWidth} height={tileImageHeight} xml={svg} style={{borderRadius:tileBorderRadiusHandPlayerPerspective,transform: [{rotate: `${90}deg`}]}} />
+        </View>
+        </View>
+        </View>
+        )}
+
+      const WallLeft = () => {
+        const evenTiles:any = [];
+        const oddTiles:any = [];
+      
+        mahjongTilesSVGsArray.slice(0,8 ).forEach((item, index) => {
+          const zIndex = index % 2 === 0 ? 1 : 0;
+          if (index % 2 === 0) {
+            evenTiles.push(<WallTileLeft svg={item} tileRatioProp={1} key={index + "a"} zIndex={1} />);
+          } else {
+            oddTiles.push(<WallTileLeft svg={item} tileRatioProp={1} key={index + "a"} zIndex={0} />);
+          }
+        });
+      
+        return (
+          <View style={{ flexDirection: "column", backgroundColor: "lightblue", width: 80,position:"relative" }}>
+            <View style={{backgroundColor:"lime",flexDirection:"column",position:"absolute",top:5,left:2}}>
+                {oddTiles}</View>
+           <View style={{backgroundColor:"transparent",flexDirection:"column",position:"absolute",top:0,}}>
+            {evenTiles}
+            </View> 
+          </View>
+        );
+      };
+      const WallTileRight=({svg,tileRatioProp=3,zIndex}:{svg:string,tileRatioProp:number,zIndex:number})=>{
+        //console.log(svg.length)
+        const tileRatio = tileRatioProp;
+        const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
+        const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
+        const tileDepth = +(14 * tileRatio).toFixed(2); // default 23 // not taking perspective into account
+        const tileImageWidth = +(33.3 * tileRatio).toFixed(2); // default 100
+        const tileImageHeight = +(33.3 * tileRatio).toFixed(2); // default 100
+        const tileSecondLayer = +(tileHeight + (tileDepth * 0.695)).toFixed(2); // 69.5% of tile depth added to tile height
+        const tileBottomLayer = +(tileHeight + tileDepth).toFixed(2) //TODO check the Riverleft values
+        const tileBorderRadiusHandPlayerPerspective = 8;
+        const riverJustifyContent=true
+        const isTileFaceUp=false//TODO fix the perspective
+        const colorBottomLayer="#98dffb"
+        const colorSecondLayer="#44809a"
+        const colorFaceLayer="#a39f9e"
+        return(
+    <View style={{backgroundColor:colorFaceLayer,height:tileWidth+8,width:tileBottomLayer-6,justifyContent:riverJustifyContent?"flex-start":"flex-end",alignItems:"flex-end", borderRadius:tileBorderRadiusHandPlayerPerspective,borderWidth:1,zIndex:zIndex,marginTop:-6}}>
+        <View style={{backgroundColor:colorSecondLayer,height:tileWidth+2 ,width:tileSecondLayer-5,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,alignItems:"flex-end"}}>
+        <View style={{backgroundColor:colorBottomLayer, height:tileWidth-2,width:tileHeight,alignItems:"center",justifyContent:"center",borderRadius:tileBorderRadiusHandPlayerPerspective}}>
+        <SvgXml width={tileImageWidth} height={tileImageHeight} xml={svg} style={{borderRadius:tileBorderRadiusHandPlayerPerspective,transform: [{rotate: `${270}deg`}]}} />
+        </View>
+        </View>
+        </View>
+        )}
+        const WallRight = () => {
+            const evenTiles:any = [];
+            const oddTiles:any = [];
+            mahjongTilesSVGsArray.slice(9,17 ).forEach((item, index) => {
+              const zIndex = index % 2 === 0 ? 1 : 0;
+              if (index % 2 === 0) {
+                evenTiles.push(<WallTileRight svg={item} tileRatioProp={1} key={index + "a"} zIndex={1} />);
+              } else {
+                oddTiles.push(<WallTileRight svg={item} tileRatioProp={1} key={index + "a"} zIndex={0} />);
+              }
+            });
+          
+            return (
+              <View style={{ flexDirection: "column", backgroundColor: "lightblue", width: 80,position:"relative" }}>
+                <View style={{backgroundColor:"lime",flexDirection:"column",position:"absolute",top:5,left:0}}>
+                    {oddTiles}</View>
+               <View style={{backgroundColor:"transparent",flexDirection:"column",position:"absolute",top:0,left:2}}>
+                {evenTiles}
+                </View> 
+              </View>
+            );
+          };
+
+          const WallTileTop=({svg,tileRatioProp=3,zIndex}:{svg:string,tileRatioProp:number,zIndex:number})=>{
+            //console.log(svg.length)
+            const tileRatio = tileRatioProp;
+            const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
+            const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
+            const tileDepth = +(14 * tileRatio).toFixed(2); // default 23 // not taking perspective into account
+            const tileImageWidth = +(33.3 * tileRatio).toFixed(2); // default 100
+            const tileImageHeight = +(33.3 * tileRatio).toFixed(2); // default 100
+            const tileSecondLayer = +(tileHeight + (tileDepth * 0.695)).toFixed(2); // 69.5% of tile depth added to tile height
+            const tileBottomLayer = +(tileHeight + tileDepth).toFixed(2)
+            const tileBorderRadiusHandPlayerPerspective = 8;
+            const riverJustifyContent=true
+            const isTileFaceUp=false//TODO fix the perspective
+            const colorBottomLayer="#98dffb"
+            const colorSecondLayer="#44809a"
+            const colorFaceLayer="#a39f9e"
+            return(
+        <View style={{backgroundColor:colorFaceLayer,height:tileBottomLayer,width:tileWidth,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,borderWidth:1,zIndex:zIndex}}>
+            <View style={{backgroundColor:colorSecondLayer,height:tileSecondLayer-5,width:tileWidth-2,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,alignItems:"center"}}>
+            <View style={{backgroundColor:colorBottomLayer, height:tileHeight,width:tileWidth-2,alignItems:"center",justifyContent:"center",borderRadius:tileBorderRadiusHandPlayerPerspective}}>
+            <SvgXml width={tileImageWidth} height={tileImageHeight} xml={svg} style={{borderRadius:tileBorderRadiusHandPlayerPerspective,transform: [{rotate: `${0}deg`}]}} />
+            </View>
+            </View>
+            </View>
+            )}
+        
+            const WallTop= () => {
+                const evenTiles:any = [];
+                const oddTiles:any = [];
+              
+                mahjongTilesSVGsArray.slice(17,25 ).forEach((item, index) => {
+                  const zIndex = index % 2 === 0 ? 1 : 0;
+                  if (index % 2 === 0) {
+                    evenTiles.push(<WallTileTop svg={item} tileRatioProp={1} key={index + "a"} zIndex={1} />);
+                  } else {
+                    oddTiles.push(<WallTileTop svg={item} tileRatioProp={1} key={index + "a"} zIndex={0} />);
+                  }
+                });
+              
+                return (
+                  <View style={{ flexDirection: "row", backgroundColor: "lightblue", height: 80,position:"relative" }}>
+                    <View style={{backgroundColor:"lime",flexDirection:"row",position:"absolute",top:10}}>
+                        {oddTiles}</View>
+                    <View style={{backgroundColor:"transparent",flexDirection:"row",position:"absolute",top:0}}>
+                    {evenTiles}
+                    </View>
+                  </View>
+                );
+              };
+        
 //TODO oficjalna skala z perspektywą???
 function MahjongScreen({navigation, route}: any) {
     return(
@@ -364,9 +560,12 @@ function MahjongScreen({navigation, route}: any) {
             </View>
             </View>
             {/* <PlayersHandComponent/> */}
-            <PlayersRiver/>
-            <RiverTop/>
-
+            <View style={{flex:1,height:300}}>
+            {/* <WallFront/> */}
+            {/* <WallLeft/> */}
+            <WallRight/>
+            <WallTop/>
+            </View>
         </ScrollView>
     )
 }
