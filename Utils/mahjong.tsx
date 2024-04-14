@@ -63,15 +63,138 @@ const TileComponent =({svg,tileRatioProp=3}:{svg:string,tileRatioProp:number})=>
 }
 
 const PlayersHandComponent=()=>{
-    const hand=mahjongTilesSVGsArray.slice(14,16).map((item,index)=><TileComponent svg={item} tileRatioProp={2} key={index+index}/>)
-    console.log("hand:",mahjongTilesSVGsArray[16])
+    const hand=mahjongTilesSVGsArray.slice(14,27).map((item,index)=><TileComponent svg={item} tileRatioProp={1.5} key={index+"a"}/>)
 
     return(
-        <View style={{flexDirection:"row",backgroundColor:"lightblue",width:"100%"}}>
+        <View style={{flexDirection:"row",backgroundColor:"lightblue",width:"100%",justifyContent:"center"}}>
     {hand}       
     </View>
     )
 }
+
+const TileInTheRiverComponentFront =({svg,tileRatioProp=3,}:{svg:string,tileRatioProp:number})=>{
+    //console.log(svg.length) //320 //60
+    const tileRatio = tileRatioProp;
+    const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
+    const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
+    const tileDepth = +(14 * tileRatio).toFixed(2); // default 23 // not taking perspective into account
+    const tileImageWidth = +(33.3 * tileRatio).toFixed(2); // default 100
+    const tileImageHeight = +(33.3 * tileRatio).toFixed(2); // default 100
+    const tileSecondLayer = +(tileHeight + (tileDepth * 0.695)).toFixed(2); // 69.5% of tile depth added to tile height
+    const tileBottomLayer = +(tileHeight + tileDepth).toFixed(2);
+    const tileBorderRadiusHandPlayerPerspective = 8;
+    const riverJustifyContent=true
+    const richiiTile=false//TODO fix the perspective
+    return(
+        <View style={{backgroundColor:'#56a2c4',height:tileBottomLayer,width:tileWidth,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,borderWidth:1,transform: [{rotate: `${richiiTile?90:0}deg`}]}}>
+        <View style={{backgroundColor:"#bdbbc0",height:tileSecondLayer,width:tileWidth-2,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,alignItems:"center"}}>
+        <View style={{backgroundColor:"#e9ebe8", height:tileHeight,width:tileWidth-2,alignItems:"center",justifyContent:"center",borderRadius:tileBorderRadiusHandPlayerPerspective}}>
+        <SvgXml width={tileImageWidth} height={tileImageHeight} xml={svg} style={{borderRadius:tileBorderRadiusHandPlayerPerspective}} />
+        </View>
+        </View>
+        </View>
+    )
+}
+
+const TileInTheRiverComponentLeft =({svg,tileRatioProp=3,}:{svg:string,tileRatioProp:number})=>{
+    //console.log(svg.length)
+    const tileRatio = tileRatioProp;
+    const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
+    const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
+    const tileDepth = +(14 * tileRatio).toFixed(2); // default 23 // not taking perspective into account
+    const tileImageWidth = +(33.3 * tileRatio).toFixed(2); // default 100
+    const tileImageHeight = +(33.3 * tileRatio).toFixed(2); // default 100
+    const tileSecondLayer = +(tileHeight + (tileDepth * 0.695)).toFixed(2)-17; // 69.5% of tile depth added to tile height
+    const tileBottomLayer = +(tileHeight + tileDepth).toFixed(2)-22;
+    const tileBorderRadiusHandPlayerPerspective = 8;
+    const riverJustifyContent=true
+    const richiiTile=false//TODO fix the perspective //marginTop:richiiTile?6: -14
+    return(
+        <View style={{backgroundColor:'#56a2c4',height:tileWidth+22,width:tileBottomLayer,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,borderWidth:1,transform: [{rotate: `${richiiTile?90:0}deg`}],marginTop:richiiTile?6:-22}}>
+        <View style={{backgroundColor:"#bdbbc0",height:tileWidth+12,width:tileSecondLayer,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,alignItems:"flex-start"}}>
+        <View style={{backgroundColor:"#e9ebe8", height:tileWidth-2,width:tileHeight,alignItems:"center",justifyContent:"center",borderRadius:tileBorderRadiusHandPlayerPerspective}}>
+        <SvgXml width={tileImageWidth} height={tileImageHeight} xml={svg} style={{borderRadius:tileBorderRadiusHandPlayerPerspective,transform: [{rotate: `${90}deg`}]}} />
+        </View>
+        </View>
+        </View>
+    )
+}
+const TileInTheRiverComponentRight =({svg,tileRatioProp=3,}:{svg:string,tileRatioProp:number})=>{
+    //console.log(svg.length)
+    const tileRatio = tileRatioProp;
+    const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
+    const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
+    const tileDepth = +(14 * tileRatio).toFixed(2); // default 23 // not taking perspective into account
+    const tileImageWidth = +(33.3 * tileRatio).toFixed(2); // default 100
+    const tileImageHeight = +(33.3 * tileRatio).toFixed(2); // default 100
+    const tileSecondLayer = +(tileHeight + (tileDepth * 0.695)).toFixed(2)-17; // 69.5% of tile depth added to tile height
+    const tileBottomLayer = +(tileHeight + tileDepth).toFixed(2)-22;
+    const tileBorderRadiusHandPlayerPerspective = 8;
+    const riverJustifyContent=true
+    const richiiTile=false//TODO fix the perspective //marginTop:richiiTile?6: -14
+    return(
+        <View style={{backgroundColor:'#56a2c4',height:tileWidth+22,width:tileBottomLayer,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,borderWidth:1,transform: [{rotate: `${richiiTile?90:0}deg`}] ,marginTop:richiiTile?6:-22 }}>
+        <View style={{backgroundColor:"#bdbbc0",height:tileWidth+10,width:tileSecondLayer,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,alignItems:"flex-end"}}>
+        <View style={{backgroundColor:"#e9ebe8", height:tileWidth-2,width:tileHeight,alignItems:"center",justifyContent:"center",borderRadius:tileBorderRadiusHandPlayerPerspective}}>
+        <SvgXml width={tileImageWidth} height={tileImageHeight} xml={svg} style={{borderRadius:tileBorderRadiusHandPlayerPerspective,transform: [{rotate: `${270}deg`}]}} />
+        </View>
+        </View>
+        </View>
+    )
+}
+const TileInTheRiverComponentTop =({svg,tileRatioProp=3,}:{svg:string,tileRatioProp:number})=>{
+    //console.log(svg.length)
+//console.log(svg.length) //320 //60
+const tileRatio = tileRatioProp;
+const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
+const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
+const tileDepth = +(14 * tileRatio).toFixed(2); // default 23 // not taking perspective into account
+const tileImageWidth = +(33.3 * tileRatio).toFixed(2); // default 100
+const tileImageHeight = +(33.3 * tileRatio).toFixed(2); // default 100
+const tileSecondLayer = +(tileHeight + (tileDepth * 0.695)).toFixed(2); // 69.5% of tile depth added to tile height
+const tileBottomLayer = +(tileHeight + tileDepth).toFixed(2);
+const tileBorderRadiusHandPlayerPerspective = 8;
+const riverJustifyContent=true
+const richiiTile=false//TODO fix the perspective
+return(
+    <View style={{backgroundColor:'#56a2c4',height:tileBottomLayer,width:tileWidth,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,borderWidth:1,transform: [{rotate: `${richiiTile?90:0}deg`}]}}>
+    <View style={{backgroundColor:"#bdbbc0",height:tileSecondLayer,width:tileWidth-2,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,alignItems:"center"}}>
+    <View style={{backgroundColor:"#e9ebe8", height:tileHeight,width:tileWidth-2,alignItems:"center",justifyContent:"center",borderRadius:tileBorderRadiusHandPlayerPerspective}}>
+    <SvgXml width={tileImageWidth} height={tileImageHeight} xml={svg} style={{borderRadius:tileBorderRadiusHandPlayerPerspective,transform: [{rotate: `${180}deg`}]}} />
+    </View>
+    </View>
+    </View>
+)
+}
+const PlayersRiver=()=>{
+    const hand=mahjongTilesSVGsArray.slice(14,20).map((item,index)=><TileInTheRiverComponentFront svg={item} tileRatioProp={2} key={index+"a"}/>)
+return(
+    <View style={{flexDirection:"row",backgroundColor:"lightblue",width:360,/*   transform: [{rotateX: '45deg'}, {rotateZ: '0deg'},{scale:0.75}] */ }}>
+    {hand}
+    </View>
+)
+}
+const RiverLeft =()=>{
+    const hand=mahjongTilesSVGsArray.slice(20,26).map((item,index)=><TileInTheRiverComponentLeft svg={item} tileRatioProp={2} key={index+"a"}/>)
+return(
+    <View style={{flexDirection:"column",backgroundColor:"lightblue",width:80,  /* transform: [{rotateX: '45deg'}, {rotateZ: '0deg'},{scale:0.75}] */ }}>
+    {hand}
+    </View>
+)}
+const RiverRight =()=>{
+    const hand=mahjongTilesSVGsArray.slice(27,33).map((item,index)=><TileInTheRiverComponentRight svg={item} tileRatioProp={2} key={index+"a"}/>)
+return(
+    <View style={{flexDirection:"column",backgroundColor:"lightblue",width:80,  /* transform: [{rotateX: '45deg'}, {rotateZ: '0deg'},{scale:0.75}] */ }}>
+    {hand}
+    </View>
+)}
+const RiverTop =()=>{
+    const hand=mahjongTilesSVGsArray.slice(2,8).map((item,index)=><TileInTheRiverComponentTop svg={item} tileRatioProp={2} key={index+"a"}/>)
+return(
+    <View style={{flexDirection:"row",width:360,  /* transform: [{rotateX: '45deg'}, {rotateZ: '0deg'},{scale:0.75}] */ }}>
+    {hand}
+    </View>
+)}
 
 const Compass = () => {
     //measuring from screenshot as a scale of reference
@@ -83,9 +206,9 @@ const Compass = () => {
     const CompassTileCounter=()=>{//317  /100 //center piece
         return(
             
-            <View style={{backgroundColor:"#1d1d1f",width:compassTilesCounterBottomPerimeter,height:compassTilesCounterBottomPerimeter,alignItems:"center",borderBottomWidth:1,borderBottomColor:"#1b2a2d"}}>
-                <Text style={{flex:1,fontSize:22,textAlign:"center",width:"100%",textAlignVertical:"center",color:"#4affff"}}>EAST 3</Text>
-                <Text style={{backgroundColor:"lightblue",flex:1,fontSize:40,width:"100%",textAlign:"center",color:"#4affff"}}>69</Text>
+            <View style={{backgroundColor:"#1d1d1f",width:compassTilesCounterBottomPerimeter,height:compassTilesCounterBottomPerimeter,alignItems:"center",borderBottomWidth:4,borderBottomColor:"#1b2a2d",borderRadius:2}}>
+                <Text style={{flex:1,fontSize:22,textAlign:"center",width:"100%",textAlignVertical:"center",color:"#4affff",borderTopRightRadius:2,borderTopLeftRadius:2}}>EAST 3</Text>
+                <Text style={{flex:1,fontSize:40,width:"100%",textAlign:"center",color:"#4affff"}}>69</Text>
             </View>
         )
     }
@@ -197,6 +320,7 @@ const Compass = () => {
     //        <CompassTileCounter/> 
     //transform: [{rotateX: '45deg'}]
     return (
+    <View style={{borderBottomWidth:8,borderRadius:8,/*  transform: [{rotateX: '45deg'}, {rotateZ: '0deg'},{scale:0.75}] */backgroundColor:"#5d5d69",width:320}}>
       <View style={{
         backgroundColor:"#39383d",
         width: compassBottomPerimeter,  //
@@ -212,18 +336,39 @@ const Compass = () => {
         <PlayerSide degrees={180} leftPosition={0} rightPosition={0} bottomPosition={0}  topPosition={0}/>
         <PlayerSide degrees={270} leftPosition={125} rightPosition={125} bottomPosition={0}  topPosition={0}/> 
         </View>
+        </View>
     );
   };
 
+
+//TODO oficjalna skala z perspektywą???
 function MahjongScreen({navigation, route}: any) {
     return(
         <ScrollView style={{flex:1}}>
-            <View style={{borderBottomWidth:8,borderRadius:8, transform: [{rotateX: '45deg'}, {rotateZ: '0deg'},{scale:0.8}],backgroundColor:"#5d5d69",width:320}}>
+            <View style={{backgroundColor:"red",flex:1,alignItems:"center",}}>
+            <View style={{alignItems:"center",backgroundColor:"blue",justifyContent:"center",width:540,height:560,position:"relative",transform: [{rotateX: '45deg'}, {rotateZ: '0deg'},{scale:0.75}]}}>
             <Compass/>
+            <View style={{position:"absolute",left:0,top:0,width:540,alignItems:"center",
+            }}>
+            <RiverTop/>
             </View>
-            <PlayersHandComponent/>
+            <View style={{position:"absolute",left:0,top:0,height:540,justifyContent:"center"}}>
+            <RiverLeft/>
+            </View>
+            <View style={{position:"absolute",right:0,top:0,height:540,backgroundColor:"pink",justifyContent:"center"}}>
+            <RiverRight/>
+            </View>
+            <View style={{position:"absolute",left:0,bottom:0,width:540,alignItems:"center",marginBottom:5}}>
+            <PlayersRiver/>
+            </View>
+            </View>
+            </View>
+            {/* <PlayersHandComponent/> */}
+            <PlayersRiver/>
+            <RiverTop/>
 
         </ScrollView>
     )
 }
 export default MahjongScreen;
+//https://github.com/software-mansion/react-native-reanimated/issues/2750
