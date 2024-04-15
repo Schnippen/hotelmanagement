@@ -26,17 +26,22 @@ import { SvgXml } from "react-native-svg"
 //from top of player hand to the bottom compass 344px
 //compass dimensions bottom perimeter 323 px/ top perimeter 305px/ height all 208px
 
-
-//Colors
+//Colors:
+//In the River:
 //Tile Front: e9ebe8
 //tile shadow: bdbbc0
 //tile back: 56a2c4
-
+//In the Wall:
+//tile Front: 98dffb"
+//tile shadow: 44809a
+//tile back: a39f9e
+//
+//number of tiles: 17*4
 //types of styling
 //-on hand NESW
 //-on wall NESW
 //-on sidetabke NESW
-//-on River NESW
+//-on River NESW  
 
 const TileComponent =({svg,tileRatioProp=3}:{svg:string,tileRatioProp:number})=>{
     //console.log(svg.length)
