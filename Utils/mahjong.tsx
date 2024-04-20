@@ -1,6 +1,6 @@
 import { Image, Text } from "@rneui/themed"
 import React from "react"
-import { ScrollView, View } from "react-native"
+import { ScrollView, View,Dimensions } from "react-native"
 import { mahjongTilesSVGsArray } from "./MahjongTiles/MahjongTiles" 
 import { SvgXml } from "react-native-svg"
 
@@ -44,7 +44,7 @@ import { SvgXml } from "react-native-svg"
 //-on River NESW  
 
 const TileComponent =({svg,tileRatioProp=3}:{svg:string,tileRatioProp:number})=>{
-    //console.log(svg.length)
+    
     const tileRatio = tileRatioProp;
     const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
     const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
@@ -54,6 +54,10 @@ const TileComponent =({svg,tileRatioProp=3}:{svg:string,tileRatioProp:number})=>
     const tileSecondLayer = +(tileHeight + (tileDepth * 0.695)).toFixed(2); // 69.5% of tile depth added to tile height
     const tileBottomLayer = +(tileHeight + tileDepth).toFixed(2);
     const tileBorderRadiusHandPlayerPerspective = 8;
+
+    const screenWidth = Dimensions.get("window").width
+    const screenHeight = Dimensions.get("window").height
+    console.log("Dimensions: ",screenWidth,"width x height",screenHeight)
 //ramka 5 px - szare 13   = 18 +1 = 19+2=21
 //sare ma padding 1 z lewej i prawej, kontur ma grubość 2 //TODO create perspective that is scalable
     return(
@@ -78,7 +82,7 @@ const PlayersHandComponent=()=>{
 }
 
 const TileInTheRiverComponentFront =({svg,tileRatioProp=3,}:{svg:string,tileRatioProp:number})=>{
-    //console.log(svg.length) //320 //60
+     //320 //60
     const tileRatio = tileRatioProp;
     const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
     const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
@@ -102,7 +106,7 @@ const TileInTheRiverComponentFront =({svg,tileRatioProp=3,}:{svg:string,tileRati
 }
 
 const TileInTheRiverComponentLeft =({svg,tileRatioProp=3,}:{svg:string,tileRatioProp:number})=>{
-    //console.log(svg.length)
+    
     const tileRatio = tileRatioProp;
     const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
     const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
@@ -125,7 +129,7 @@ const TileInTheRiverComponentLeft =({svg,tileRatioProp=3,}:{svg:string,tileRatio
     )
 }
 const TileInTheRiverComponentRight =({svg,tileRatioProp=3,}:{svg:string,tileRatioProp:number})=>{
-    //console.log(svg.length)
+    
     const tileRatio = tileRatioProp;
     const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
     const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
@@ -148,8 +152,8 @@ const TileInTheRiverComponentRight =({svg,tileRatioProp=3,}:{svg:string,tileRati
     )
 }
 const TileInTheRiverComponentTop =({svg,tileRatioProp=3,}:{svg:string,tileRatioProp:number})=>{
-    //console.log(svg.length)
-//console.log(svg.length) //320 //60
+    
+ //320 //60
 const tileRatio = tileRatioProp;
 const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
 const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
@@ -346,7 +350,7 @@ const Compass = () => {
   };
   
   const WallTile=({svg,tileRatioProp=3,zIndex}:{svg:string,tileRatioProp:number,zIndex:number})=>{
-    //console.log(svg.length)
+    
     const tileRatio = tileRatioProp;
     const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
     const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
@@ -396,7 +400,7 @@ const Compass = () => {
       };
 
       const WallTileLeft=({svg,tileRatioProp=3,zIndex}:{svg:string,tileRatioProp:number,zIndex:number})=>{
-        //console.log(svg.length)
+        
         const tileRatio = tileRatioProp;
         const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
         const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
@@ -436,7 +440,7 @@ const Compass = () => {
       
         return (
           <View style={{ flexDirection: "column", backgroundColor: "lightblue", width: 80,position:"relative" }}>
-            <View style={{backgroundColor:"lime",flexDirection:"column",position:"absolute",top:5,left:2}}>
+            <View style={{backgroundColor:"lime",flexDirection:"column",position:"absolute",top:5,left:3}}>
                 {oddTiles}</View>
            <View style={{backgroundColor:"transparent",flexDirection:"column",position:"absolute",top:0,}}>
             {evenTiles}
@@ -445,7 +449,7 @@ const Compass = () => {
         );
       };
       const WallTileRight=({svg,tileRatioProp=3,zIndex}:{svg:string,tileRatioProp:number,zIndex:number})=>{
-        //console.log(svg.length)
+        
         const tileRatio = tileRatioProp;
         const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
         const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
@@ -461,14 +465,15 @@ const Compass = () => {
         const colorSecondLayer="#44809a"
         const colorFaceLayer="#a39f9e"
         return(
-    <View style={{backgroundColor:colorFaceLayer,height:tileWidth+8,width:tileBottomLayer-6,justifyContent:riverJustifyContent?"flex-start":"flex-end",alignItems:"flex-end", borderRadius:tileBorderRadiusHandPlayerPerspective,borderWidth:1,zIndex:zIndex,marginTop:-6}}>
+    <View style={{backgroundColor:colorFaceLayer,height:tileWidth+8,width:tileBottomLayer-6,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,borderWidth:1,zIndex:zIndex,marginTop:-6,alignItems:"flex-end"}}>
         <View style={{backgroundColor:colorSecondLayer,height:tileWidth+2 ,width:tileSecondLayer-5,justifyContent:riverJustifyContent?"flex-start":"flex-end",borderRadius:tileBorderRadiusHandPlayerPerspective,alignItems:"flex-end"}}>
         <View style={{backgroundColor:colorBottomLayer, height:tileWidth-2,width:tileHeight,alignItems:"center",justifyContent:"center",borderRadius:tileBorderRadiusHandPlayerPerspective}}>
-        <SvgXml width={tileImageWidth} height={tileImageHeight} xml={svg} style={{borderRadius:tileBorderRadiusHandPlayerPerspective,transform: [{rotate: `${270}deg`}]}} />
+        <SvgXml width={tileImageWidth} height={tileImageHeight} xml={svg} style={{borderRadius:tileBorderRadiusHandPlayerPerspective,transform: [{rotate: `${90}deg`}]}} />
         </View>
         </View>
         </View>
         )}
+        
         const WallRight = () => {
             const evenTiles:any = [];
             const oddTiles:any = [];
@@ -485,7 +490,7 @@ const Compass = () => {
               <View style={{ flexDirection: "column", backgroundColor: "lightblue", width: 80,position:"relative" }}>
                 <View style={{backgroundColor:"lime",flexDirection:"column",position:"absolute",top:5,left:0}}>
                     {oddTiles}</View>
-               <View style={{backgroundColor:"transparent",flexDirection:"column",position:"absolute",top:0,left:2}}>
+               <View style={{backgroundColor:"transparent",flexDirection:"column",position:"absolute",top:0,left:3}}>
                 {evenTiles}
                 </View> 
               </View>
@@ -493,7 +498,7 @@ const Compass = () => {
           };
 
           const WallTileTop=({svg,tileRatioProp=3,zIndex}:{svg:string,tileRatioProp:number,zIndex:number})=>{
-            //console.log(svg.length)
+            
             const tileRatio = tileRatioProp;
             const tileWidth = +(30 * tileRatio).toFixed(2); // default 30 x 3
             const tileHeight = +(39 * tileRatio).toFixed(2); // default 39 x 3
@@ -533,7 +538,7 @@ const Compass = () => {
               
                 return (
                   <View style={{ flexDirection: "row", backgroundColor: "lightblue", height: 80,position:"relative" }}>
-                    <View style={{backgroundColor:"lime",flexDirection:"row",position:"absolute",top:10}}>
+                    <View style={{backgroundColor:"lime",flexDirection:"row",position:"absolute",top:12}}>
                         {oddTiles}</View>
                     <View style={{backgroundColor:"transparent",flexDirection:"row",position:"absolute",top:0}}>
                     {evenTiles}
@@ -566,10 +571,10 @@ function MahjongScreen({navigation, route}: any) {
             </View>
             {/* <PlayersHandComponent/> */}
             <View style={{flex:1,height:300}}>
-            {/* <WallFront/> */}
-            {/* <WallLeft/> */}
-            <WallRight/>
-            <WallTop/>
+            <WallFront/> 
+            {/* <WallLeft/> */} 
+            {/* <WallRight/> */}
+             <WallTop/>
             </View>
         </ScrollView>
     )
