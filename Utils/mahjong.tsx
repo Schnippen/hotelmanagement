@@ -1,8 +1,9 @@
 import { Image, Text } from "@rneui/themed"
 import React from "react"
-import { ScrollView, View,Dimensions } from "react-native"
+import { ScrollView, View,Dimensions, FlatList } from "react-native"
 import { mahjongTilesSVGsArray } from "./MahjongTiles/MahjongTiles" 
 import { SvgXml } from "react-native-svg"
+import { Tile } from "@rneui/base"
 
 //tiles
 //winning conditions
@@ -55,9 +56,9 @@ const TileComponent =({svg,tileRatioProp=3}:{svg:string,tileRatioProp:number})=>
     const tileBottomLayer = +(tileHeight + tileDepth).toFixed(2);
     const tileBorderRadiusHandPlayerPerspective = 8;
 
-    const screenWidth = Dimensions.get("window").width
-    const screenHeight = Dimensions.get("window").height
-    console.log("Dimensions: ",screenWidth,"width x height",screenHeight)
+    const screenWidth = Dimensions.get("screen").width
+    const screenHeight = Dimensions.get("screen").height
+    //console.log("Dimensions: ",screenWidth,"width x height:",screenHeight)
 //ramka 5 px - szare 13   = 18 +1 = 19+2=21
 //sare ma padding 1 z lewej i prawej, kontur ma grubość 2 //TODO create perspective that is scalable
     return(
@@ -559,6 +560,86 @@ const Compass = () => {
                   </View>
                 );
               };
+
+    const DoraPanel=()=>{
+      const numberOfPlayers ="4P"
+      const gameType="Friend Hanchan"
+
+      const CurrentDoras=()=>{
+        const currentDoras1=mahjongTilesSVGsArray.slice(3,8)
+        const currentDoras=mahjongTilesSVGsArray.slice(3,8).map((item,index)=><TileComponent svg={item} tileRatioProp={1.5} key={index+"a"}/>)
+        const renderItem = ({ item }:{item:string}) => (
+          <TileComponent svg={item} tileRatioProp={1} />
+        );
+        return(
+          <FlatList
+          data={currentDoras1}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          horizontal
+          scrollEnabled={false}
+          style={{backgroundColor:"pink"}}
+        />
+        
+        )
+      }
+
+      const RichiiAndHonba=()=>{
+
+        const HonbaStick = () => {
+          const HonbaDot = () => (
+            <View style={{ backgroundColor: 'black', borderRadius: 8, width: 2, height: 2 }} />
+          );
+        
+          return (
+            <View style={{ backgroundColor: '#e9ebe8', height: 12, width: 30, borderRadius: 4, borderWidth: 1,transform: [{rotateZ: '290deg'}] }}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 4,flex:1 }}>
+                <HonbaDot />
+                <HonbaDot />
+                <HonbaDot />
+                <HonbaDot />
+              </View>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center', paddingHorizontal: 4,flex:1 }}>
+                <HonbaDot />
+                <HonbaDot />
+                <HonbaDot />
+                <HonbaDot />
+              </View>
+            </View>
+          );
+        };
+        
+        const HonbaStickRichii = () => {
+          return (
+            <View style={{ backgroundColor: '#e9ebe8', height: 12, width: 30, borderRadius: 4, borderWidth: 1 ,justifyContent:"center",alignItems:"center" ,transform: [{rotateZ: '290deg'}]}}>
+                  <View style={{backgroundColor:"#bd383b", height:4,width:4,borderRadius:8}}/>
+            </View>
+          );
+        };
+
+
+        return(
+        <View style={{backgroundColor:"orange",flex:1,flexDirection:"row",justifyContent:"center",alignItems:"center",width:"100%"}}>
+          <HonbaStickRichii/>
+          <Text>x 0</Text>
+          <HonbaStick/>
+          <Text>x 0</Text>
+
+        </View>)
+      }
+
+      return(
+        <View style={{width:170,height:110,backgroundColor:"lightblue",alignItems:"center",borderRadius:8,rowGap:2}}>
+          <View style={{backgroundColor:"yellow",width:"100%",height:25,alignItems:"center",justifyContent:"center"}} >
+          <Text adjustsFontSizeToFit={true}>{numberOfPlayers+" · "+gameType}</Text>
+          </View>
+          <View style={{width:"100%",alignItems:"center",justifyContent:"center",backgroundColor:"red"}}>
+            <CurrentDoras/></View>
+            
+            <RichiiAndHonba/>
+          </View>
+      )
+    }
         
 //TODO oficjalna skala z perspektywą???
 function MahjongScreen({navigation, route}: any) {
@@ -585,11 +666,12 @@ function MahjongScreen({navigation, route}: any) {
             {/* <PlayersHandComponent/> */}
             <View style={{flex:1,height:300}}>
             <WallFront/> 
+            <DoraPanel/>
             {/* <WallLeft/> */} 
             {/* <WallRight/> */}
-            <RichiiStick degrees={180}/>
-             {/* <WallTop/> */}
-            </View>
+            {/* <RichiiStick degrees={180}/> */}
+             {/* <WallTop/> */}            
+             </View>
         </ScrollView>
     )
 }
