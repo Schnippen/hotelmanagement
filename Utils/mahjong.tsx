@@ -71,6 +71,18 @@ const TileComponent =({svg,tileRatioProp=3}:{svg:string,tileRatioProp:number})=>
     )
 }
 
+const RichiiStick =({degrees}:{degrees:number})=>{
+  //use transform on it
+  //TODO create styles dependend on perspective
+  const position = degrees===0?"front":degrees===90?"right":degrees===180?"top":degrees===270?"left":null //130 /126 /18 /14  chage to /18 /16
+  return(     
+  <View style={{width:130,backgroundColor:"#bdbbc0",height:18,borderWidth:1,borderRightWidth:2,borderLeftWidth:2,borderRadius:6,}}>
+    <View style={{backgroundColor:"#e9ebe8",width:position==="front"||"top"?126:124,height:position==="front"||"top"?14:16,alignItems:"center",justifyContent:"center",alignSelf:position==="front"||"top"?"center":"flex-end",borderRadius:4}}>
+    <View style={{backgroundColor:"#bd383b", height:8,width:8,borderRadius:8}}></View>
+    </View>
+  </View>)
+}
+
 const PlayersHandComponent=()=>{
     const hand=mahjongTilesSVGsArray.slice(14,27).map((item,index)=><TileComponent svg={item} tileRatioProp={1.5} key={index+"a"}/>)
 
@@ -274,10 +286,12 @@ const Compass = () => {
             </View>
         )
     }
-    const CompassRichiiIndicator=()=>{
+    const CompassRichiiIndicator=({isRichiiActive,degrees}:{isRichiiActive:boolean,degrees:number})=>{
         return(
             <View style={{width:200,height:30,justifyContent:"center",backgroundColor:"#5d5d69",alignItems:'center',}}>
-                <View style={{backgroundColor:"black",height:20,width:150,borderRadius:20}}></View>
+                <View style={{backgroundColor:"black",height:20,width:150,borderRadius:20,justifyContent:"center",alignItems:"center"}}>
+                  {isRichiiActive?<RichiiStick degrees={degrees}/>:null}
+                </View>
             </View>
         )
     }
@@ -313,7 +327,7 @@ const Compass = () => {
             </View>
         )
     }
-    const PlayerSide=({degrees=0,bottomPosition=0,topPosition=0,leftPosition=0,rightPosition=0}:{degrees:number,bottomPosition:number,topPosition:number,leftPosition:number,rightPosition:number})=>{
+    const PlayerSide=({isRichiiActive,degrees=0,bottomPosition=0,topPosition=0,leftPosition=0,rightPosition=0}:{isRichiiActive:boolean,degrees:number,bottomPosition:number,topPosition:number,leftPosition:number,rightPosition:number})=>{
         //TODO to 125 to have perspecive
         //const degrees=0
         return(
@@ -321,7 +335,7 @@ const Compass = () => {
         <CompassWindIndicator/>
             <View style={{flexDirection:"column",height:70,backgroundColor:"transparent"}}>
             <CompassTurnIndicator/>
-            <CompassRichiiIndicator/>
+            <CompassRichiiIndicator isRichiiActive={isRichiiActive} degrees={degrees}/>
             </View>
         </View>
         )
@@ -340,10 +354,10 @@ const Compass = () => {
         borderRadius:8,
       }} >
         <CompassTileCounter/> 
-         <PlayerSide degrees={0} leftPosition={0} rightPosition={250} bottomPosition={0}  topPosition={0}/> 
-        <PlayerSide degrees={90} leftPosition={-125} rightPosition={125} bottomPosition={0}  topPosition={0}/> 
-        <PlayerSide degrees={180} leftPosition={0} rightPosition={0} bottomPosition={0}  topPosition={0}/>
-        <PlayerSide degrees={270} leftPosition={125} rightPosition={125} bottomPosition={0}  topPosition={0}/> 
+         <PlayerSide isRichiiActive={true} degrees={0} leftPosition={0} rightPosition={250} bottomPosition={0}  topPosition={0}/> 
+        <PlayerSide isRichiiActive={false} degrees={90} leftPosition={-125} rightPosition={125} bottomPosition={0}  topPosition={0}/> 
+        <PlayerSide isRichiiActive={false} degrees={180} leftPosition={0} rightPosition={0} bottomPosition={0}  topPosition={0}/>
+        <PlayerSide  isRichiiActive={false}  degrees={270} leftPosition={125} rightPosition={125} bottomPosition={0}  topPosition={0}/> 
         </View>
         </View>
     );
@@ -574,7 +588,8 @@ function MahjongScreen({navigation, route}: any) {
             <WallFront/> 
             {/* <WallLeft/> */} 
             {/* <WallRight/> */}
-             <WallTop/>
+            <RichiiStick degrees={180}/>
+             {/* <WallTop/> */}
             </View>
         </ScrollView>
     )
