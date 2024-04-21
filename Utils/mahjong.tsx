@@ -1,9 +1,9 @@
-import { Image, Text } from "@rneui/themed"
+import { Button, Image, Text } from "@rneui/themed"
 import React from "react"
 import { ScrollView, View,Dimensions, FlatList } from "react-native"
 import { mahjongTilesSVGsArray } from "./MahjongTiles/MahjongTiles" 
 import { SvgXml } from "react-native-svg"
-import { Tile } from "@rneui/base"
+import LinearGradient from "react-native-linear-gradient"
 
 //tiles
 //winning conditions
@@ -43,6 +43,9 @@ import { Tile } from "@rneui/base"
 //-on wall NESW
 //-on sidetabke NESW
 //-on River NESW  
+const screenWidth = Dimensions.get("screen").width
+const screenHeight = Dimensions.get("screen").height
+console.log("Dimensions: ",screenWidth,"width x height:",screenHeight)
 
 const TileComponent =({svg,tileRatioProp=3}:{svg:string,tileRatioProp:number})=>{
     
@@ -56,9 +59,7 @@ const TileComponent =({svg,tileRatioProp=3}:{svg:string,tileRatioProp:number})=>
     const tileBottomLayer = +(tileHeight + tileDepth).toFixed(2);
     const tileBorderRadiusHandPlayerPerspective = 8;
 
-    const screenWidth = Dimensions.get("screen").width
-    const screenHeight = Dimensions.get("screen").height
-    //console.log("Dimensions: ",screenWidth,"width x height:",screenHeight)
+
 //ramka 5 px - szare 13   = 18 +1 = 19+2=21
 //sare ma padding 1 z lewej i prawej, kontur ma grubość 2 //TODO create perspective that is scalable
     return(
@@ -84,11 +85,15 @@ const RichiiStick =({degrees}:{degrees:number})=>{
 }
 
 const PlayersHandComponent=()=>{
-    const hand=mahjongTilesSVGsArray.slice(14,27).map((item,index)=><TileComponent svg={item} tileRatioProp={1.5} key={index+"a"}/>)
-
+  const playersHandData=mahjongTilesSVGsArray.slice(14,27)
+  const nextTile = mahjongTilesSVGsArray.slice(28,29).toString()
+    const renderItem = ({ item }:{item:string}) => (
+      <TileComponent svg={item} tileRatioProp={1.5} />
+    );
     return(
-        <View style={{flexDirection:"row",backgroundColor:"lightblue",width:"100%",justifyContent:"center"}}>
-    {hand}       
+<View style={{flexDirection:"row",backgroundColor:"gray",justifyContent:"center"}}>
+    <FlatList horizontal scrollEnabled={false} data={playersHandData} renderItem={renderItem} keyExtractor={(item, index) => index.toString()}/>
+    <TileComponent svg={nextTile} tileRatioProp={1.5} />
     </View>
     )
 }
@@ -188,10 +193,19 @@ return(
 )
 }
 const PlayersRiver=()=>{
+  const data=mahjongTilesSVGsArray.slice(14,20) //river data 
+  const dataLength = data.length
     const hand=mahjongTilesSVGsArray.slice(14,20).map((item,index)=><TileInTheRiverComponentFront svg={item} tileRatioProp={2} key={index+"a"}/>)
-return(
-    <View style={{flexDirection:"row",backgroundColor:"lightblue",width:360,/*   transform: [{rotateX: '45deg'}, {rotateZ: '0deg'},{scale:0.75}] */ }}>
-    {hand}
+
+    const renderItem = ({ item }:{item:string}) => (
+      <TileInTheRiverComponentFront svg={item} tileRatioProp={2} />
+    )
+    
+  return(
+    <View style={{flexDirection:"column",backgroundColor:"lightblue",width:360,/*   transform: [{rotateX: '45deg'}, {rotateZ: '0deg'},{scale:0.75}] */ }}>
+      <FlatList data={data}          renderItem={renderItem}
+       scrollEnabled={false} numColumns={6}
+      keyExtractor={(item, index) => index.toString()}/>
     </View>
 )
 }
@@ -608,7 +622,7 @@ const Compass = () => {
             </View>
           );
         };
-        
+
         const HonbaStickRichii = () => {
           return (
             <View style={{ backgroundColor: '#e9ebe8', height: 12, width: 30, borderRadius: 4, borderWidth: 1 ,justifyContent:"center",alignItems:"center" ,transform: [{rotateZ: '290deg'}]}}>
@@ -640,7 +654,75 @@ const Compass = () => {
           </View>
       )
     }
-        
+
+  const ButtonShape = ({text,firstColor,secondColor}:{text:string,firstColor:string,secondColor:string}) => {
+  return (
+    <Button radius={"md"}
+    buttonStyle={{height:40,width:120,}}
+    titleStyle={{fontWeight:"bold"}}
+    ViewComponent={LinearGradient} 
+    linearGradientProps={{
+      colors: [firstColor, secondColor],
+      start: { x: 0, y: 0.5 },
+      end: { x: 1, y: 0.5 },
+    }}>
+      {text}
+    </Button>
+  );
+};
+const ButtonRIICHI=()=>{
+  return(
+    <ButtonShape text="RIICHI" firstColor="#f6d106" secondColor="#cc7000"/>
+  )
+}
+const ButtonPON=()=>{
+  return(
+    <ButtonShape text="PON" firstColor="#48cae4" secondColor="#023e8a"/>
+  )
+}
+const ButtonPASS=()=>{
+  return(
+    <ButtonShape text="PASS" firstColor="#9dc1db" secondColor="#688aa5"/>
+  )
+}
+const ButtonCANCEL=()=>{
+  return(
+    <ButtonShape text="CANCEL" firstColor="#9dc1db" secondColor="#688aa5"/>
+  )
+}
+const ButtonCHII=()=>{
+  return(
+    <ButtonShape text="CHII" firstColor="#19e09f" secondColor="#12bf63"/>
+  )
+}
+const ButtonKAN=()=>{
+  return(
+    <ButtonShape text="KAN" firstColor="#be95c4" secondColor="#5e548e"/>
+  )
+}
+const ButtonRON=()=>{
+  return(
+    <ButtonShape text="RON" firstColor="#dc2f02" secondColor="#fb8b24"/>
+  )
+}
+const ButtonTSUMO=()=>{ 
+  return(
+    <ButtonShape text="TSUMO" firstColor="#dc2f02" secondColor="#fb8b24"/>
+  )
+}
+
+const PlayerPanel=()=>{
+  return(
+    <View style={{backgroundColor:"purple",height:150,width:screenWidth}}>
+      <View style={{flexDirection:"row",columnGap:8,justifyContent:"flex-end"}}>
+         <ButtonPASS/>   
+             <ButtonCHII/>
+        </View>
+      <PlayersHandComponent/>
+    </View>
+  )
+}
+
 //TODO oficjalna skala z perspektywą???
 function MahjongScreen({navigation, route}: any) {
     return(
@@ -663,14 +745,21 @@ function MahjongScreen({navigation, route}: any) {
             </View>
             </View>
             </View>
-            {/* <PlayersHandComponent/> */}
             <View style={{flex:1,height:300}}>
             <WallFront/> 
-            <DoraPanel/>
+            {/* <DoraPanel/> */}
             {/* <WallLeft/> */} 
             {/* <WallRight/> */}
             {/* <RichiiStick degrees={180}/> */}
-             {/* <WallTop/> */}            
+             {/* <WallTop/> */}
+            {/*  <ButtonRON/>         
+             <ButtonRIICHI/>
+             <ButtonKAN/>
+             <ButtonPON/>
+             <ButtonPASS/>   
+             <ButtonCHII/>
+             <ButtonCANCEL/> */}
+             <PlayerPanel/>
              </View>
         </ScrollView>
     )
